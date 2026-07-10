@@ -1,0 +1,6 @@
+{
+  "name": "Clinique Santé Plus CI",
+  "description": "Système complet de gestion et de transformation numérique pour la Clinique Santé Plus CI (Rendez-vous, patients, pharmacie, facturation, rappels, plaintes et assistant IA).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

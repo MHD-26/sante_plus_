@@ -1,0 +1,321 @@
+import { Patient, Appointment, Medication, Invoice, Complaint, UserRole } from "./types";
+
+export const INITIAL_PATIENTS: Patient[] = [
+  {
+    id: "PAT-001",
+    firstName: "Marie",
+    lastName: "Kouassi Amenan",
+    phone: "+2250707123456",
+    email: "marie.kouassi@email.com",
+    birthDate: "1988-05-14",
+    gender: "Féminin",
+    bloodType: "A+",
+    allergies: "Pénicilline, arachides",
+    sensitiveDataSigned: true,
+    createdAt: "2026-01-10T10:00:00Z",
+    medicalHistory: [
+      {
+        id: "MED-001",
+        date: "2026-06-15",
+        diagnosis: "Paludisme simple",
+        prescription: "Coartem 80/480mg (1 tab 2x/jour pendant 3 jours), Paracétamol 1g (3x/jour)",
+        doctorName: "Dr. Essoh Cyrille"
+      },
+      {
+        id: "MED-002",
+        date: "2026-02-20",
+        diagnosis: "Consultation prénatale de suivi",
+        prescription: "Spasfon si douleur, Acide Folique, Calcium",
+        doctorName: "Dr. Bamba Salimata"
+      }
+    ]
+  },
+  {
+    id: "PAT-002",
+    firstName: "Ibrahim",
+    lastName: "Touré",
+    phone: "+2250556789012",
+    email: "ibrahim.toure@email.com",
+    birthDate: "1975-11-23",
+    gender: "Masculin",
+    bloodType: "O+",
+    allergies: "Aucune connue",
+    sensitiveDataSigned: true,
+    createdAt: "2026-02-14T08:30:00Z",
+    medicalHistory: [
+      {
+        id: "MED-003",
+        date: "2026-05-10",
+        diagnosis: "Hypertension artérielle légère",
+        prescription: "Amlodipine 5mg (1 tab/jour le matin), Régime hyposodé",
+        doctorName: "Dr. Kouamé Franck"
+      }
+    ]
+  },
+  {
+    id: "PAT-003",
+    firstName: "Fatoumata",
+    lastName: "Koné",
+    phone: "+2250102030405",
+    email: "fatou.kone@email.com",
+    birthDate: "1994-09-02",
+    gender: "Féminin",
+    bloodType: "B-",
+    allergies: "Sulfamides",
+    sensitiveDataSigned: true,
+    createdAt: "2026-03-01T14:15:00Z",
+    medicalHistory: [
+      {
+        id: "MED-004",
+        date: "2026-06-28",
+        diagnosis: "Angine bactérienne",
+        prescription: "Amoxicilline 1g (3x/jour pendant 6 jours), Maxilase sirop (1 càs 3x/jour)",
+        doctorName: "Dr. Essoh Cyrille"
+      }
+    ]
+  },
+  {
+    id: "PAT-004",
+    firstName: "Amadou",
+    lastName: "Diallo",
+    phone: "+2250789456123",
+    email: "amadou.diallo@email.com",
+    birthDate: "1962-03-30",
+    gender: "Masculin",
+    bloodType: "AB+",
+    allergies: "Aspirine",
+    sensitiveDataSigned: true,
+    createdAt: "2026-04-18T11:00:00Z",
+    medicalHistory: [
+      {
+        id: "MED-005",
+        date: "2026-04-20",
+        diagnosis: "Diabète de type 2 de contrôle",
+        prescription: "Metformine 1000mg (2 tab/jour pendant les repas), Glycémie capillaire régulière",
+        doctorName: "Dr. Kouamé Franck"
+      }
+    ]
+  },
+  {
+    id: "PAT-005",
+    firstName: "Koffi Jean-Baptiste",
+    lastName: "Yao",
+    phone: "+2250505998877",
+    email: "koffi.yao@email.com",
+    birthDate: "2002-07-08",
+    gender: "Masculin",
+    bloodType: "O-",
+    allergies: "Aucune connue",
+    sensitiveDataSigned: false,
+    createdAt: "2026-06-05T09:45:00Z",
+    medicalHistory: []
+  }
+];
+
+export const INITIAL_APPOINTMENTS: Appointment[] = [
+  {
+    id: "RDV-001",
+    patientId: "PAT-001",
+    patientName: "Marie Kouassi Amenan",
+    patientPhone: "+2250707123456",
+    doctorName: "Dr. Essoh Cyrille",
+    date: "2026-07-08", // Today
+    time: "10:30",
+    reason: "Suivi post-paludisme et fatigue générale",
+    status: "À faire",
+    notes: "Patient demande un certificat médical"
+  },
+  {
+    id: "RDV-002",
+    patientId: "PAT-002",
+    patientName: "Ibrahim Touré",
+    patientPhone: "+2250556789012",
+    doctorName: "Dr. Kouamé Franck",
+    date: "2026-07-08", // Today
+    time: "14:15",
+    reason: "Contrôle annuel de tension artérielle",
+    status: "Confirmé",
+    notes: "Prendre sa tension avant consultation"
+  },
+  {
+    id: "RDV-003",
+    patientId: "PAT-003",
+    patientName: "Fatoumata Koné",
+    patientPhone: "+2250102030405",
+    doctorName: "Dr. Essoh Cyrille",
+    date: "2026-07-09", // Tomorrow
+    time: "09:00",
+    reason: "Vérification amygdales et angine",
+    status: "À faire",
+    notes: "Dossier patient à préparer"
+  },
+  {
+    id: "RDV-004",
+    patientId: "PAT-004",
+    patientName: "Amadou Diallo",
+    patientPhone: "+2250789456123",
+    doctorName: "Dr. Kouamé Franck",
+    date: "2026-07-10",
+    time: "11:00",
+    reason: "Renouvellement ordonnance diabète",
+    status: "À faire",
+    notes: "Apporter ses résultats d'HbA1c"
+  },
+  {
+    id: "RDV-005",
+    patientId: "PAT-005",
+    patientName: "Koffi Jean-Baptiste Yao",
+    patientPhone: "+2250505998877",
+    doctorName: "Dr. Bamba Salimata",
+    date: "2026-07-07", // Yesterday
+    time: "15:30",
+    reason: "Fièvre et courbatures intenses",
+    status: "Confirmé",
+    notes: "Urgence reçue à l'accueil"
+  }
+];
+
+export const INITIAL_INVENTORY: Medication[] = [
+  {
+    id: "MEDIC-001",
+    name: "Coartem 80/480mg (Artéméther/Luméfantrine)",
+    category: "Antipaludéens",
+    quantity: 120,
+    unit: "Boîtes de 6 cp",
+    threshold: 30,
+    expiryDate: "2027-12-31",
+    price: 3500 // FCFA
+  },
+  {
+    id: "MEDIC-002",
+    name: "Paracétamol 1g (Doliprane)",
+    category: "Analgésiques",
+    quantity: 450,
+    unit: "Boîtes de 8 cp",
+    threshold: 50,
+    expiryDate: "2028-06-30",
+    price: 1200
+  },
+  {
+    id: "MEDIC-003",
+    name: "Amoxicilline 1g (Clamoxyl)",
+    category: "Antibiotiques",
+    quantity: 25, // CRITICAL: Below threshold 30
+    unit: "Boîtes de 12 cp",
+    threshold: 30,
+    expiryDate: "2027-03-15",
+    price: 2500
+  },
+  {
+    id: "MEDIC-004",
+    name: "Amlodipine 5mg",
+    category: "Cardiologie",
+    quantity: 80,
+    unit: "Boîtes de 30 cp",
+    threshold: 20,
+    expiryDate: "2028-01-20",
+    price: 4000
+  },
+  {
+    id: "MEDIC-005",
+    name: "Metformine 1000mg (Glucophage)",
+    category: "Diabétologie",
+    quantity: 15, // CRITICAL: Below threshold 20
+    unit: "Boîtes de 30 cp",
+    threshold: 20,
+    expiryDate: "2027-09-10",
+    price: 3800
+  },
+  {
+    id: "MEDIC-006",
+    name: "Spasfon Injectable",
+    category: "Antispasmodiques",
+    quantity: 60,
+    unit: "Ampoules de 4ml",
+    threshold: 15,
+    expiryDate: "2026-11-30",
+    price: 1500
+  }
+];
+
+export const INITIAL_INVOICES: Invoice[] = [
+  {
+    id: "FAC-260701",
+    patientId: "PAT-001",
+    patientName: "Marie Kouassi Amenan",
+    date: "2026-07-01",
+    items: [
+      { description: "Consultation Médecin Généraliste", quantity: 1, unitPrice: 10000 },
+      { description: "Test de Diagnostic Rapide Paludisme (TDR)", quantity: 1, unitPrice: 2000 },
+      { description: "Coartem 80/480mg (Boîte)", quantity: 1, unitPrice: 3500 },
+      { description: "Paracétamol 1g", quantity: 1, unitPrice: 1200 }
+    ],
+    amount: 16700,
+    status: "Payé",
+    paymentMethod: "Wave / Orange / MTN"
+  },
+  {
+    id: "FAC-260705",
+    patientId: "PAT-002",
+    patientName: "Ibrahim Touré",
+    date: "2026-07-05",
+    items: [
+      { description: "Consultation de Spécialité (Dr. Kouamé)", quantity: 1, unitPrice: 15000 },
+      { description: "Mesure de Tension Électronique", quantity: 1, unitPrice: 1000 }
+    ],
+    amount: 16000,
+    status: "Payé",
+    paymentMethod: "Espèces"
+  },
+  {
+    id: "FAC-260707",
+    patientId: "PAT-005",
+    patientName: "Koffi Jean-Baptiste Yao",
+    date: "2026-07-07",
+    items: [
+      { description: "Urgence médicale de nuit", quantity: 1, unitPrice: 15000 },
+      { description: "Perfusions d'urgence réhydratation", quantity: 1, unitPrice: 8500 }
+    ],
+    amount: 23500,
+    status: "En attente",
+    paymentMethod: "Assurance (Assur)"
+  }
+];
+
+export const INITIAL_COMPLAINTS: Complaint[] = [
+  {
+    id: "PLT-001",
+    patientName: "Amadou Diallo",
+    patientPhone: "+2250789456123",
+    date: "2026-06-25",
+    category: "Temps d'attente",
+    description: "J'ai attendu plus de 2 heures avant de voir le Dr. Kouamé Franck alors que j'avais un rendez-vous fixe à 10h. C'est inacceptable.",
+    severity: "Moyenne",
+    status: "Résolu",
+    resolutionNotes: "Appel du patient pour excuses. Une réorganisation des plages de rendez-vous a été mise en place avec l'agent d'accueil.",
+    satisfactionScore: 4
+  },
+  {
+    id: "PLT-002",
+    patientName: "Koné Fatoumata",
+    patientPhone: "+2250102030405",
+    date: "2026-07-02",
+    category: "Accueil",
+    description: "Le personnel d'accueil semblait très débordé et n'a pas répondu poliment à mes questions concernant le remboursement de ma mutuelle.",
+    severity: "Basse",
+    status: "En cours de traitement",
+    resolutionNotes: "Entretien prévu avec les agents d'accueil pour rappeler les standards de communication bienveillante."
+  },
+  {
+    id: "PLT-003",
+    patientName: "Kouassi Amenan Marie",
+    patientPhone: "+2250707123456",
+    date: "2026-07-06",
+    category: "Tarification",
+    description: "Une incohérence sur le tarif du médicament Coartem entre le site d'affichage et le prix facturé en caisse.",
+    severity: "Moyenne",
+    status: "Résolu",
+    resolutionNotes: "Erreur de saisie dans le logiciel de facturation corrigée immédiatement. Remboursement de la différence (500 FCFA) effectué.",
+    satisfactionScore: 5
+  }
+];
