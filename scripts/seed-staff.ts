@@ -122,7 +122,7 @@ async function runSeed() {
         const authRes = await users.create(
           ID.unique(),
           staff.email,
-          staff.phone,
+          undefined,
           undefined,
           staff.fullName
         );

@@ -1,3 +1,0 @@
-0000000000000000000000000000000000000000 0facf18fda154c58b15e5bc283f7dec22b273ca5 root <root@localhost.(none)> 1783964501 +0000
-0facf18fda154c58b15e5bc283f7dec22b273ca5 0facf18fda154c58b15e5bc283f7dec22b273ca5 root <root@localhost.(none)> 1783964502 +0000	reset: moving to HEAD
-0facf18fda154c58b15e5bc283f7dec22b273ca5 69c8a1f1b60f2be3c12e52ab14c87e2715141982 MHD-26 <mg15120774@gmail.com> 1783964551 +0000	commit: docs: ajouter documentation, tests, pipeline CI et configurations de qualité de code
