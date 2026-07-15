@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import {
@@ -1980,6 +1979,7 @@ Voici une analyse clinique générique pour vous accompagner :
 async function configureServer() {
   if (process.env.NODE_ENV !== "production") {
     console.log("Configuration de Vite en mode développement...");
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
