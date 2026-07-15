@@ -11,10 +11,14 @@ export default defineConfig(() => {
     plugins: [react(), tailwindcss()],
     define: {
       "process.env.APPWRITE_ENDPOINT": JSON.stringify(
-        process.env.APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1"
+        process.env.VITE_APPWRITE_ENDPOINT || process.env.APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1"
       ),
-      "process.env.APPWRITE_PROJECT_ID": JSON.stringify(process.env.APPWRITE_PROJECT_ID || ""),
-      "process.env.APPWRITE_DATABASE_ID": JSON.stringify(process.env.APPWRITE_DATABASE_ID || ""),
+      "process.env.APPWRITE_PROJECT_ID": JSON.stringify(
+        process.env.VITE_APPWRITE_PROJECT_ID || process.env.APPWRITE_PROJECT_ID || ""
+      ),
+      "process.env.APPWRITE_DATABASE_ID": JSON.stringify(
+        process.env.VITE_APPWRITE_DATABASE_ID || process.env.APPWRITE_DATABASE_ID || ""
+      ),
     },
     resolve: {
       alias: {

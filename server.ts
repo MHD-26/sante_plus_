@@ -91,10 +91,10 @@ let nodeUsers: NodeUsers | null = null;
 let nodeDatabases: NodeDatabases | null = null;
 
 function getNodeAppwrite() {
-  const endpoint = process.env.APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1";
-  const projectId = process.env.APPWRITE_PROJECT_ID;
+  const endpoint = process.env.VITE_APPWRITE_ENDPOINT || process.env.APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1";
+  const projectId = process.env.VITE_APPWRITE_PROJECT_ID || process.env.APPWRITE_PROJECT_ID;
   const apiKey = process.env.APPWRITE_API_KEY;
-  const databaseId = process.env.APPWRITE_DATABASE_ID;
+  const databaseId = process.env.VITE_APPWRITE_DATABASE_ID || process.env.APPWRITE_DATABASE_ID;
 
   if (!projectId || !apiKey || !databaseId || projectId === "remplir_ici_votre_project_id") {
     throw new Error("Configuration Appwrite manquante ou invalide.");
@@ -454,8 +454,8 @@ app.post("/api/staff/delete/:id", enforceRBAC(["administrateur"]), async (req, r
 
 // Fonction auxiliaire pour vérifier les identifiants en direct auprès d'Appwrite sans contrainte de CORS
 async function verifyCredentials(email: string, password: string): Promise<boolean> {
-  const endpoint = process.env.APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1";
-  const projectId = process.env.APPWRITE_PROJECT_ID;
+  const endpoint = process.env.VITE_APPWRITE_ENDPOINT || process.env.APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1";
+  const projectId = process.env.VITE_APPWRITE_PROJECT_ID || process.env.APPWRITE_PROJECT_ID;
 
   if (!projectId || projectId === "remplir_ici_votre_project_id") {
     return false;

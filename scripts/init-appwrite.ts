@@ -4,10 +4,10 @@ import dotenv from "dotenv";
 // Chargement des variables d'environnement
 dotenv.config();
 
-const endpoint = process.env.APPWRITE_ENDPOINT;
-const projectId = process.env.APPWRITE_PROJECT_ID;
+const endpoint = process.env.VITE_APPWRITE_ENDPOINT || process.env.APPWRITE_ENDPOINT;
+const projectId = process.env.VITE_APPWRITE_PROJECT_ID || process.env.APPWRITE_PROJECT_ID;
 const apiKey = process.env.APPWRITE_API_KEY;
-const databaseId = process.env.APPWRITE_DATABASE_ID;
+const databaseId = process.env.VITE_APPWRITE_DATABASE_ID || process.env.APPWRITE_DATABASE_ID;
 
 console.log("================================================================");
 console.log("🏥 SCRIPT D'INITIALISATION DE LA BASE DE DONNÉES SANTE_PLUS");

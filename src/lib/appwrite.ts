@@ -1,8 +1,8 @@
 import { Client, Account, Databases, ID } from "appwrite";
 
-const endpoint = process.env.APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1";
-const projectId = process.env.APPWRITE_PROJECT_ID || "";
-const databaseId = process.env.APPWRITE_DATABASE_ID || "";
+const endpoint = import.meta.env.VITE_APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1";
+const projectId = import.meta.env.VITE_APPWRITE_PROJECT_ID || "";
+const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID || "";
 
 // Vérification de la configuration d'Appwrite
 export const isAppwriteConfigured =
