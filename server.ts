@@ -1999,4 +1999,10 @@ async function configureServer() {
   });
 }
 
-configureServer();
+// Sur Vercel, nous exportons l'application Express pour qu'elle soit gérée par une Serverless Function d'API.
+// Nous n'appelons app.listen que si nous ne sommes pas sur la plateforme Vercel.
+if (!process.env.VERCEL) {
+  configureServer();
+}
+
+export default app;
