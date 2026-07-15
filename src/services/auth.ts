@@ -20,21 +20,24 @@ export function generateStrongPassword(): string {
   const lowercase = "abcdefghijklmnopqrstuvwxyz";
   const digits = "0123456789";
   const specials = "!@#$%^&*()_+~`|}{[]:;?><,./-=";
-  
+
   // Garantir au moins un caractère de chaque type
   let password = "";
   password += uppercase[Math.floor(Math.random() * uppercase.length)];
   password += lowercase[Math.floor(Math.random() * lowercase.length)];
   password += digits[Math.floor(Math.random() * digits.length)];
   password += specials[Math.floor(Math.random() * specials.length)];
-  
+
   const allChars = uppercase + lowercase + digits + specials;
   for (let i = 4; i < length; i++) {
     password += allChars[Math.floor(Math.random() * allChars.length)];
   }
-  
+
   // Mélanger le mot de passe de façon non prévisible
-  return password.split('').sort(() => 0.5 - Math.random()).join('');
+  return password
+    .split("")
+    .sort(() => 0.5 - Math.random())
+    .join("");
 }
 
 export const authService = {
@@ -46,7 +49,9 @@ export const authService = {
     const cleanId = identifier.trim();
 
     if (!isAppwriteConfigured) {
-      throw new Error("Appwrite n'est pas configuré. Veuillez vérifier vos variables d'environnement.");
+      throw new Error(
+        "Appwrite n'est pas configuré. Veuillez vérifier vos variables d'environnement."
+      );
     }
 
     // 1. C'est déjà une adresse e-mail
@@ -57,11 +62,9 @@ export const authService = {
     // 2. Recherche par numéro de patient / dossier (ex: PAT-xxx)
     if (cleanId.toUpperCase().startsWith("PAT-") || cleanId.length < 8) {
       try {
-        const patientsRes = await databases.listDocuments(
-          APPWRITE_DB_ID,
-          "patients",
-          [Query.equal("dossierNumber", cleanId)]
-        );
+        const patientsRes = await databases.listDocuments(APPWRITE_DB_ID, "patients", [
+          Query.equal("dossierNumber", cleanId),
+        ]);
 
         if (patientsRes.documents.length > 0) {
           const patientDoc = patientsRes.documents[0];
@@ -76,11 +79,9 @@ export const authService = {
 
     // 3. Recherche par numéro de téléphone dans la collection users
     try {
-      const usersRes = await databases.listDocuments(
-        APPWRITE_DB_ID,
-        "users",
-        [Query.equal("phone", cleanId)]
-      );
+      const usersRes = await databases.listDocuments(APPWRITE_DB_ID, "users", [
+        Query.equal("phone", cleanId),
+      ]);
 
       if (usersRes.documents.length > 0) {
         return usersRes.documents[0].email;
@@ -100,24 +101,29 @@ export const authService = {
     const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ identifier, password })
+      body: JSON.stringify({ identifier, password }),
     });
 
     if (!response.ok) {
       const errData = await response.json();
-      throw new Error(errData.error || "Identifiants de connexion incorrects ou compte inexistant.");
+      throw new Error(
+        errData.error || "Identifiants de connexion incorrects ou compte inexistant."
+      );
     }
 
     const data = await response.json();
 
-    // Si c'est une connexion réelle d'Appwrite, on tente de créer également la session côté client 
+    // Si c'est une connexion réelle d'Appwrite, on tente de créer également la session côté client
     // afin de conserver la session s'ils n'ont pas de blocage CORS, mais on ne bloque pas si ça échoue.
     if (isAppwriteConfigured && !data.simulated) {
       try {
         const email = await this.resolveEmail(identifier).catch(() => identifier);
         await account.createEmailPasswordSession(email, password);
       } catch (clientSessionErr) {
-        console.warn("⚠️ Session client non établie (CORS), utilisation de l'authentification serveur validée.", clientSessionErr);
+        console.warn(
+          "⚠️ Session client non établie (CORS), utilisation de l'authentification serveur validée.",
+          clientSessionErr
+        );
       }
     }
 
@@ -133,18 +139,16 @@ export const authService = {
     }
 
     const authAccount = await account.get();
-    
+
     // Charger les préférences de l'utilisateur (pour le flag de réinitialisation du mot de passe)
     const prefs = await account.getPrefs();
     const mustChangePassword = !!prefs.mustChangePassword;
 
     // Chercher le document correspondant dans la collection "users"
     try {
-      const usersRes = await databases.listDocuments(
-        APPWRITE_DB_ID,
-        "users",
-        [Query.equal("email", authAccount.email)]
-      );
+      const usersRes = await databases.listDocuments(APPWRITE_DB_ID, "users", [
+        Query.equal("email", authAccount.email),
+      ]);
 
       if (usersRes.documents.length === 0) {
         throw new Error("Aucun profil utilisateur trouvé dans la base de données.");
@@ -156,11 +160,9 @@ export const authService = {
       let dossierNumber = undefined;
       if (userDoc.role === UserRole.PATIENT) {
         try {
-          const patientsRes = await databases.listDocuments(
-            APPWRITE_DB_ID,
-            "patients",
-            [Query.equal("user", userDoc.$id)]
-          );
+          const patientsRes = await databases.listDocuments(APPWRITE_DB_ID, "patients", [
+            Query.equal("user", userDoc.$id),
+          ]);
           if (patientsRes.documents.length > 0) {
             dossierNumber = patientsRes.documents[0].dossierNumber;
           }
@@ -177,7 +179,7 @@ export const authService = {
         role: userDoc.role as UserRole,
         status: userDoc.status,
         mustChangePassword,
-        dossierNumber
+        dossierNumber,
       };
     } catch (dbErr) {
       // Profil absent de la bdd, on retourne un profil par défaut basé sur l'auth
@@ -188,7 +190,7 @@ export const authService = {
         phone: authAccount.phone,
         role: UserRole.PATIENT,
         status: "actif",
-        mustChangePassword
+        mustChangePassword,
       };
     }
   },
@@ -221,12 +223,14 @@ export const authService = {
     const response = await fetch("/api/auth/register-patient", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
       const errData = await response.json();
-      throw new Error(errData.error || "Une erreur est survenue lors de la création de votre compte.");
+      throw new Error(
+        errData.error || "Une erreur est survenue lors de la création de votre compte."
+      );
     }
 
     const resData = await response.json();
@@ -239,7 +243,10 @@ export const authService = {
           await account.createEmailPasswordSession(data.email, passToUse);
         }
       } catch (clientSessionErr) {
-        console.warn("⚠️ Session d'inscription client non établie en direct (CORS), utilisation du compte authentifié serveur.", clientSessionErr);
+        console.warn(
+          "⚠️ Session d'inscription client non établie en direct (CORS), utilisation du compte authentifié serveur.",
+          clientSessionErr
+        );
       }
     }
 
@@ -257,7 +264,7 @@ export const authService = {
       const response = await fetch("/api/auth/update-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, password })
+        body: JSON.stringify({ userId, password }),
       });
       if (!response.ok) {
         const errData = await response.json();
@@ -277,7 +284,7 @@ export const authService = {
         const response = await fetch("/api/auth/update-password", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: currentUser.$id, password })
+          body: JSON.stringify({ userId: currentUser.$id, password }),
         });
         if (!response.ok) {
           const errData = await response.json();
@@ -305,9 +312,9 @@ export const authService = {
     const response = await fetch("/api/staff/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(staffData)
+      body: JSON.stringify(staffData),
     });
-    
+
     if (!response.ok) {
       const errData = await response.json();
       throw new Error(errData.error || "Échec de la création du compte personnel.");
@@ -319,7 +326,7 @@ export const authService = {
     const response = await fetch(`/api/staff/update/${staffId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updates)
+      body: JSON.stringify(updates),
     });
 
     if (!response.ok) {
@@ -332,7 +339,7 @@ export const authService = {
   async deleteStaffAccount(staffId: string): Promise<any> {
     const response = await fetch(`/api/staff/delete/${staffId}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!response.ok) {
@@ -359,5 +366,5 @@ export const authService = {
       console.error("Appwrite recovery error:", err);
       throw new Error(err.message || "Échec de l'envoi du lien de récupération.");
     }
-  }
+  },
 };

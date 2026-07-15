@@ -5,16 +5,17 @@ const projectId = process.env.APPWRITE_PROJECT_ID || "";
 const databaseId = process.env.APPWRITE_DATABASE_ID || "";
 
 // Vérification de la configuration d'Appwrite
-export const isAppwriteConfigured = projectId !== "" && projectId !== "remplir_ici_votre_project_id" && databaseId !== "";
+export const isAppwriteConfigured =
+  projectId !== "" && projectId !== "remplir_ici_votre_project_id" && databaseId !== "";
 
 const client = new Client();
 
 if (isAppwriteConfigured) {
-  client
-    .setEndpoint(endpoint)
-    .setProject(projectId);
+  client.setEndpoint(endpoint).setProject(projectId);
 } else {
-  console.warn("⚠️ Appwrite n'est pas complètement configuré dans le fichier .env (PROJECT_ID ou DATABASE_ID manquant).");
+  console.warn(
+    "⚠️ Appwrite n'est pas complètement configuré dans le fichier .env (PROJECT_ID ou DATABASE_ID manquant)."
+  );
 }
 
 export const account = new Account(client);

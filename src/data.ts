@@ -19,16 +19,16 @@ export const INITIAL_PATIENTS: Patient[] = [
         date: "2026-06-15",
         diagnosis: "Paludisme simple",
         prescription: "Coartem 80/480mg (1 tab 2x/jour pendant 3 jours), Paracétamol 1g (3x/jour)",
-        doctorName: "Dr. Essoh Cyrille"
+        doctorName: "Dr. Essoh Cyrille",
       },
       {
         id: "MED-002",
         date: "2026-02-20",
         diagnosis: "Consultation prénatale de suivi",
         prescription: "Spasfon si douleur, Acide Folique, Calcium",
-        doctorName: "Dr. Bamba Salimata"
-      }
-    ]
+        doctorName: "Dr. Bamba Salimata",
+      },
+    ],
   },
   {
     id: "PAT-002",
@@ -48,9 +48,9 @@ export const INITIAL_PATIENTS: Patient[] = [
         date: "2026-05-10",
         diagnosis: "Hypertension artérielle légère",
         prescription: "Amlodipine 5mg (1 tab/jour le matin), Régime hyposodé",
-        doctorName: "Dr. Kouamé Franck"
-      }
-    ]
+        doctorName: "Dr. Kouamé Franck",
+      },
+    ],
   },
   {
     id: "PAT-003",
@@ -70,9 +70,9 @@ export const INITIAL_PATIENTS: Patient[] = [
         date: "2026-06-28",
         diagnosis: "Angine bactérienne",
         prescription: "Amoxicilline 1g (3x/jour pendant 6 jours), Maxilase sirop (1 càs 3x/jour)",
-        doctorName: "Dr. Essoh Cyrille"
-      }
-    ]
+        doctorName: "Dr. Essoh Cyrille",
+      },
+    ],
   },
   {
     id: "PAT-004",
@@ -91,10 +91,11 @@ export const INITIAL_PATIENTS: Patient[] = [
         id: "MED-005",
         date: "2026-04-20",
         diagnosis: "Diabète de type 2 de contrôle",
-        prescription: "Metformine 1000mg (2 tab/jour pendant les repas), Glycémie capillaire régulière",
-        doctorName: "Dr. Kouamé Franck"
-      }
-    ]
+        prescription:
+          "Metformine 1000mg (2 tab/jour pendant les repas), Glycémie capillaire régulière",
+        doctorName: "Dr. Kouamé Franck",
+      },
+    ],
   },
   {
     id: "PAT-005",
@@ -108,8 +109,8 @@ export const INITIAL_PATIENTS: Patient[] = [
     allergies: "Aucune connue",
     sensitiveDataSigned: false,
     createdAt: "2026-06-05T09:45:00Z",
-    medicalHistory: []
-  }
+    medicalHistory: [],
+  },
 ];
 
 export const INITIAL_APPOINTMENTS: Appointment[] = [
@@ -123,7 +124,7 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
     time: "10:30",
     reason: "Suivi post-paludisme et fatigue générale",
     status: "À faire",
-    notes: "Patient demande un certificat médical"
+    notes: "Patient demande un certificat médical",
   },
   {
     id: "RDV-002",
@@ -135,7 +136,7 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
     time: "14:15",
     reason: "Contrôle annuel de tension artérielle",
     status: "Confirmé",
-    notes: "Prendre sa tension avant consultation"
+    notes: "Prendre sa tension avant consultation",
   },
   {
     id: "RDV-003",
@@ -147,7 +148,7 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
     time: "09:00",
     reason: "Vérification amygdales et angine",
     status: "À faire",
-    notes: "Dossier patient à préparer"
+    notes: "Dossier patient à préparer",
   },
   {
     id: "RDV-004",
@@ -159,7 +160,7 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
     time: "11:00",
     reason: "Renouvellement ordonnance diabète",
     status: "À faire",
-    notes: "Apporter ses résultats d'HbA1c"
+    notes: "Apporter ses résultats d'HbA1c",
   },
   {
     id: "RDV-005",
@@ -171,8 +172,32 @@ export const INITIAL_APPOINTMENTS: Appointment[] = [
     time: "15:30",
     reason: "Fièvre et courbatures intenses",
     status: "Confirmé",
-    notes: "Urgence reçue à l'accueil"
-  }
+    notes: "Urgence reçue à l'accueil",
+  },
+  {
+    id: "RDV-006",
+    patientId: "PAT-001",
+    patientName: "Marie Kouassi Amenan",
+    patientPhone: "+2250707123456",
+    doctorName: "Dr. Essoh Cyrille",
+    date: "2026-07-14",
+    time: "08:30",
+    reason: "Examen de suivi cardio",
+    status: "À faire",
+    notes: "Nécessite ECG préalable",
+  },
+  {
+    id: "RDV-007",
+    patientId: "PAT-002",
+    patientName: "Ibrahim Touré",
+    patientPhone: "+2250556789012",
+    doctorName: "Dr. Kouamé Franck",
+    date: "2026-07-14",
+    time: "10:00",
+    reason: "Contrôle glycémique trimestriel",
+    status: "À faire",
+    notes: "Venir à jeun",
+  },
 ];
 
 export const INITIAL_INVENTORY: Medication[] = [
@@ -184,7 +209,7 @@ export const INITIAL_INVENTORY: Medication[] = [
     unit: "Boîtes de 6 cp",
     threshold: 30,
     expiryDate: "2027-12-31",
-    price: 3500 // FCFA
+    price: 3500, // FCFA
   },
   {
     id: "MEDIC-002",
@@ -194,7 +219,7 @@ export const INITIAL_INVENTORY: Medication[] = [
     unit: "Boîtes de 8 cp",
     threshold: 50,
     expiryDate: "2028-06-30",
-    price: 1200
+    price: 1200,
   },
   {
     id: "MEDIC-003",
@@ -204,7 +229,7 @@ export const INITIAL_INVENTORY: Medication[] = [
     unit: "Boîtes de 12 cp",
     threshold: 30,
     expiryDate: "2027-03-15",
-    price: 2500
+    price: 2500,
   },
   {
     id: "MEDIC-004",
@@ -214,7 +239,7 @@ export const INITIAL_INVENTORY: Medication[] = [
     unit: "Boîtes de 30 cp",
     threshold: 20,
     expiryDate: "2028-01-20",
-    price: 4000
+    price: 4000,
   },
   {
     id: "MEDIC-005",
@@ -224,7 +249,7 @@ export const INITIAL_INVENTORY: Medication[] = [
     unit: "Boîtes de 30 cp",
     threshold: 20,
     expiryDate: "2027-09-10",
-    price: 3800
+    price: 3800,
   },
   {
     id: "MEDIC-006",
@@ -234,8 +259,8 @@ export const INITIAL_INVENTORY: Medication[] = [
     unit: "Ampoules de 4ml",
     threshold: 15,
     expiryDate: "2026-11-30",
-    price: 1500
-  }
+    price: 1500,
+  },
 ];
 
 export const INITIAL_INVOICES: Invoice[] = [
@@ -248,11 +273,11 @@ export const INITIAL_INVOICES: Invoice[] = [
       { description: "Consultation Médecin Généraliste", quantity: 1, unitPrice: 10000 },
       { description: "Test de Diagnostic Rapide Paludisme (TDR)", quantity: 1, unitPrice: 2000 },
       { description: "Coartem 80/480mg (Boîte)", quantity: 1, unitPrice: 3500 },
-      { description: "Paracétamol 1g", quantity: 1, unitPrice: 1200 }
+      { description: "Paracétamol 1g", quantity: 1, unitPrice: 1200 },
     ],
     amount: 16700,
     status: "Payé",
-    paymentMethod: "Wave / Orange / MTN"
+    paymentMethod: "Wave / Orange / MTN",
   },
   {
     id: "FAC-260705",
@@ -261,11 +286,11 @@ export const INITIAL_INVOICES: Invoice[] = [
     date: "2026-07-05",
     items: [
       { description: "Consultation de Spécialité (Dr. Kouamé)", quantity: 1, unitPrice: 15000 },
-      { description: "Mesure de Tension Électronique", quantity: 1, unitPrice: 1000 }
+      { description: "Mesure de Tension Électronique", quantity: 1, unitPrice: 1000 },
     ],
     amount: 16000,
     status: "Payé",
-    paymentMethod: "Espèces"
+    paymentMethod: "Espèces",
   },
   {
     id: "FAC-260707",
@@ -274,12 +299,12 @@ export const INITIAL_INVOICES: Invoice[] = [
     date: "2026-07-07",
     items: [
       { description: "Urgence médicale de nuit", quantity: 1, unitPrice: 15000 },
-      { description: "Perfusions d'urgence réhydratation", quantity: 1, unitPrice: 8500 }
+      { description: "Perfusions d'urgence réhydratation", quantity: 1, unitPrice: 8500 },
     ],
     amount: 23500,
     status: "En attente",
-    paymentMethod: "Assurance (Assur)"
-  }
+    paymentMethod: "Assurance (Assur)",
+  },
 ];
 
 export const INITIAL_COMPLAINTS: Complaint[] = [
@@ -289,11 +314,13 @@ export const INITIAL_COMPLAINTS: Complaint[] = [
     patientPhone: "+2250789456123",
     date: "2026-06-25",
     category: "Temps d'attente",
-    description: "J'ai attendu plus de 2 heures avant de voir le Dr. Kouamé Franck alors que j'avais un rendez-vous fixe à 10h. C'est inacceptable.",
+    description:
+      "J'ai attendu plus de 2 heures avant de voir le Dr. Kouamé Franck alors que j'avais un rendez-vous fixe à 10h. C'est inacceptable.",
     severity: "Moyenne",
     status: "Résolu",
-    resolutionNotes: "Appel du patient pour excuses. Une réorganisation des plages de rendez-vous a été mise en place avec l'agent d'accueil.",
-    satisfactionScore: 4
+    resolutionNotes:
+      "Appel du patient pour excuses. Une réorganisation des plages de rendez-vous a été mise en place avec l'agent d'accueil.",
+    satisfactionScore: 4,
   },
   {
     id: "PLT-002",
@@ -301,10 +328,12 @@ export const INITIAL_COMPLAINTS: Complaint[] = [
     patientPhone: "+2250102030405",
     date: "2026-07-02",
     category: "Accueil",
-    description: "Le personnel d'accueil semblait très débordé et n'a pas répondu poliment à mes questions concernant le remboursement de ma mutuelle.",
+    description:
+      "Le personnel d'accueil semblait très débordé et n'a pas répondu poliment à mes questions concernant le remboursement de ma mutuelle.",
     severity: "Basse",
     status: "En cours de traitement",
-    resolutionNotes: "Entretien prévu avec les agents d'accueil pour rappeler les standards de communication bienveillante."
+    resolutionNotes:
+      "Entretien prévu avec les agents d'accueil pour rappeler les standards de communication bienveillante.",
   },
   {
     id: "PLT-003",
@@ -312,10 +341,140 @@ export const INITIAL_COMPLAINTS: Complaint[] = [
     patientPhone: "+2250707123456",
     date: "2026-07-06",
     category: "Tarification",
-    description: "Une incohérence sur le tarif du médicament Coartem entre le site d'affichage et le prix facturé en caisse.",
+    description:
+      "Une incohérence sur le tarif du médicament Coartem entre le site d'affichage et le prix facturé en caisse.",
     severity: "Moyenne",
     status: "Résolu",
-    resolutionNotes: "Erreur de saisie dans le logiciel de facturation corrigée immédiatement. Remboursement de la différence (500 FCFA) effectué.",
-    satisfactionScore: 5
-  }
+    resolutionNotes:
+      "Erreur de saisie dans le logiciel de facturation corrigée immédiatement. Remboursement de la différence (500 FCFA) effectué.",
+    satisfactionScore: 5,
+  },
+];
+
+export const INITIAL_CONSULTATIONS: any[] = [
+  {
+    id: "CSL-001",
+    patientId: "PAT-001",
+    patientName: "Kouassi Amenan Marie",
+    doctorName: "Dr. Essoh Cyrille",
+    date: "2026-06-15",
+    time: "10:30",
+    temperature: 39.2,
+    weight: 65,
+    bloodPressure: "12/8",
+    heartRate: 88,
+    symptoms: "Forte fièvre, frissons, courbatures sévères et maux de tête depuis 2 jours.",
+    diagnosis: "Paludisme simple suspecté, confirmé par TDR",
+    notes:
+      "Patient stable mais fébrile. Réhydratation orale recommandée. Repos de 3 jours prescrit.",
+    prescriptionId: "ORD-001",
+    labRequestId: "LAB-001",
+  },
+  {
+    id: "CSL-002",
+    patientId: "PAT-002",
+    patientName: "Touré Ibrahim",
+    doctorName: "Dr. Kouamé Franck",
+    date: "2026-05-10",
+    time: "09:15",
+    temperature: 37.1,
+    weight: 82,
+    bloodPressure: "15/9",
+    heartRate: 74,
+    symptoms: "Légères céphalées matinales et acouphènes occasionnels.",
+    diagnosis: "Hypertension artérielle légère",
+    notes:
+      "Conseils hygiéno-diététiques prodigués (régime hyposodé, réduction du stress). Activité sportive régulière encouragée.",
+    prescriptionId: "ORD-002",
+  },
+];
+
+export const INITIAL_PRESCRIPTIONS: any[] = [
+  {
+    id: "ORD-001",
+    patientId: "PAT-001",
+    patientName: "Kouassi Amenan Marie",
+    doctorName: "Dr. Essoh Cyrille",
+    date: "2026-06-15",
+    items: [
+      {
+        medicationName: "Coartem 80/480mg",
+        dosage: "1 comprimé",
+        frequency: "2 fois par jour",
+        duration: "3 jours",
+      },
+      {
+        medicationName: "Paracétamol 1g",
+        dosage: "1 comprimé",
+        frequency: "3 fois par jour",
+        duration: "5 jours",
+      },
+    ],
+    status: "Délivrée",
+    dispensedDate: "2026-06-15",
+    notes: "Médicaments fournis par la pharmacie interne.",
+  },
+  {
+    id: "ORD-002",
+    patientId: "PAT-002",
+    patientName: "Touré Ibrahim",
+    doctorName: "Dr. Kouamé Franck",
+    date: "2026-05-10",
+    items: [
+      {
+        medicationName: "Amlodipine 5mg",
+        dosage: "1 comprimé",
+        frequency: "1 fois par jour",
+        duration: "30 jours",
+      },
+    ],
+    status: "Prescrite",
+    notes: "À renouveler si TA stabilisée.",
+  },
+];
+
+export const INITIAL_LAB_REQUESTS: any[] = [
+  {
+    id: "LAB-001",
+    patientId: "PAT-001",
+    patientName: "Kouassi Amenan Marie",
+    doctorName: "Dr. Essoh Cyrille",
+    date: "2026-06-15",
+    tests: [
+      {
+        name: "Test de Diagnostic Rapide (TDR Paludisme)",
+        result: "POSITIF (Plasmodium falciparum)",
+        referenceRange: "Négatif",
+        status: "Prêt",
+      },
+      {
+        name: "Goutte Épaisse (Paludisme)",
+        result: "Positif (+++ / 1500 trophozoïtes/µL)",
+        referenceRange: "Négatif",
+        status: "Prêt",
+      },
+      {
+        name: "Numération Formule Sanguine (NFS)",
+        result: "Hémoglobine : 11.2 g/dL, Leucocytes : 6500/mm³",
+        referenceRange: "12.0 - 16.0 g/dL",
+        status: "Prêt",
+      },
+    ],
+    status: "Prêt",
+    technicianName: "Yao Kouassi (Technicien)",
+    updatedAt: "2026-06-15T11:45:00Z",
+    notes: "Forte suspicion d'accès palustre biologique.",
+  },
+  {
+    id: "LAB-002",
+    patientId: "PAT-003",
+    patientName: "Koné Fatoumata",
+    doctorName: "Dr. Essoh Cyrille",
+    date: "2026-07-12",
+    tests: [
+      { name: "Sérodiagnostic de Widal & Félix (Typhoïde)", status: "En attente" },
+      { name: "Glycémie à jeun", status: "En attente" },
+    ],
+    status: "En attente",
+  },
 ];

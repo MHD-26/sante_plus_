@@ -10,7 +10,7 @@ export enum UserRole {
   COMPTABLE = "comptable",
   PHARMACIE = "pharmacien",
   LABORATOIRE = "laboratoire",
-  PATIENT = "patient"
+  PATIENT = "patient",
 }
 
 export interface MedicalRecordEntry {
@@ -36,7 +36,14 @@ export interface Patient {
   createdAt: string;
 }
 
-export type AppointmentStatus = "À faire" | "Envoyé" | "Confirmé" | "Reporté" | "Absent" | "En attente de confirmation";
+export type AppointmentStatus =
+  | "À faire"
+  | "Envoyé"
+  | "Confirmé"
+  | "Reporté"
+  | "Absent"
+  | "En attente de confirmation"
+  | "Confirmation envoyée";
 
 export interface Appointment {
   id: string;
@@ -49,6 +56,9 @@ export interface Appointment {
   reason: string;
   status: AppointmentStatus;
   notes: string;
+  whatsappSentAtDate?: string;
+  whatsappSentAtTime?: string;
+  whatsappSentBy?: string;
 }
 
 export interface Medication {
@@ -78,6 +88,67 @@ export interface Invoice {
   amount: number;
   status: "Payé" | "En attente" | "Annulé";
   paymentMethod: "Espèces" | "Wave / Orange / MTN" | "Carte Bancaire" | "Assurance (Assur)";
+  insuranceName?: string;
+  insuranceCoverageRate?: number; // e.g. 70, 80, 100 for percentage
+  insuranceAmount?: number;
+  patientAmount?: number;
+}
+
+export interface Consultation {
+  id: string;
+  patientId: string;
+  patientName: string;
+  doctorName: string;
+  date: string;
+  time: string;
+  temperature: number; // in °C
+  weight: number; // in kg
+  bloodPressure: string; // e.g. "12/8"
+  heartRate: number; // bpm
+  symptoms: string;
+  diagnosis: string;
+  notes: string;
+  prescriptionId?: string; // Linked prescription
+  labRequestId?: string; // Linked lab request
+}
+
+export interface PrescriptionItem {
+  medicationName: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+}
+
+export interface Prescription {
+  id: string;
+  patientId: string;
+  patientName: string;
+  doctorName: string;
+  date: string;
+  items: PrescriptionItem[];
+  status: "Prescrite" | "Délivrée";
+  dispensedDate?: string;
+  notes?: string;
+}
+
+export interface LabTest {
+  name: string;
+  result?: string;
+  referenceRange?: string;
+  status: "En attente" | "En cours" | "Prêt";
+}
+
+export interface LabRequest {
+  id: string;
+  patientId: string;
+  patientName: string;
+  doctorName: string;
+  date: string;
+  tests: LabTest[];
+  status: "En attente" | "En cours" | "Prêt";
+  technicianName?: string;
+  updatedAt?: string;
+  notes?: string;
 }
 
 export interface Complaint {
@@ -102,13 +173,24 @@ export interface SystemBackup {
   inventory: Medication[];
   invoices: Invoice[];
   complaints: Complaint[];
+  consultations?: Consultation[];
+  prescriptions?: Prescription[];
+  labRequests?: LabRequest[];
 }
 
 // Local Sync Queue for Offline Management
 export interface SyncAction {
   id: string;
   timestamp: string;
-  type: "CREATE_PATIENT" | "CREATE_APPOINTMENT" | "UPDATE_APPOINTMENT" | "DELETE_APPOINTMENT" | "UPDATE_STOCK" | "CREATE_INVOICE" | "CREATE_COMPLAINT";
+  type:
+    | "CREATE_PATIENT"
+    | "UPDATE_PATIENT"
+    | "CREATE_APPOINTMENT"
+    | "UPDATE_APPOINTMENT"
+    | "DELETE_APPOINTMENT"
+    | "UPDATE_STOCK"
+    | "CREATE_INVOICE"
+    | "CREATE_COMPLAINT";
   payload: any;
 }
 
@@ -123,4 +205,3 @@ export interface AuditLog {
   ipAddress?: string;
   status: "Succès" | "Échec";
 }
-

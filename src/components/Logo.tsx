@@ -19,7 +19,7 @@ export default function Logo({ className = "", size = 48 }: LogoProps) {
         We use premium solid-color layered vector shapes instead of gradient ID definitions (url(#...)).
         This guarantees 100% reliable rendering in all browsers, iframes, full-screen tabs, and routing setups.
       */}
-      
+
       {/* 1. Lighter 3D shift/accent arm in the background (mint/sage green) */}
       <path
         d="M 82 35 A 10 10 0 0 1 92 25 L 122 25 A 10 10 0 0 1 132 35 L 132 75 L 172 75 A 10 10 0 0 1 182 85 L 182 115 A 10 10 0 0 1 172 125 L 132 125 L 132 165 A 10 10 0 0 1 122 175 L 92 175 A 10 10 0 0 1 82 165 Z"
@@ -70,4 +70,3 @@ export default function Logo({ className = "", size = 48 }: LogoProps) {
     </svg>
   );
 }
-

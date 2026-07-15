@@ -17,10 +17,7 @@ if (!projectId || !apiKey || !databaseId || projectId === "remplir_ici_votre_pro
   process.exit(1);
 }
 
-const client = new Client()
-  .setEndpoint(endpoint)
-  .setProject(projectId)
-  .setKey(apiKey);
+const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
 
 const users = new Users(client);
 const databases = new Databases(client);
@@ -31,61 +28,66 @@ const STAFF_MEMBERS = [
     email: "seydou.toure@santeplus.ci",
     phone: "+2250707070701",
     role: "directeur",
-    password: "SantePlus@2026"
+    password: "SantePlus@2026",
   },
   {
     fullName: "M. Charles Konan",
     email: "charles.konan@santeplus.ci",
     phone: "+2250707070702",
     role: "administrateur",
-    password: "SantePlus@2026"
+    password: "SantePlus@2026",
   },
   {
     fullName: "Dr. Koné Mamadou",
     email: "kone.mamadou@santeplus.ci",
     phone: "+2250707070703",
     role: "medecin",
-    password: "SantePlus@2026"
+    password: "SantePlus@2026",
   },
   {
     fullName: "Dr. Fatou Diop",
     email: "fatou.diop@santeplus.ci",
     phone: "+2250707070704",
     role: "medecin",
-    password: "SantePlus@2026"
+    password: "SantePlus@2026",
   },
   {
     fullName: "Mme. Marie-Laure Yao",
     email: "marielaure.yao@santeplus.ci",
     phone: "+2250707070705",
     role: "pharmacien",
-    password: "SantePlus@2026"
+    password: "SantePlus@2026",
   },
   {
     fullName: "M. Koffi N'Guessan",
     email: "koffi.nguessan@santeplus.ci",
     phone: "+2250707070706",
     role: "comptable",
-    password: "SantePlus@2026"
+    password: "SantePlus@2026",
   },
   {
     fullName: "Mme. Aminata Coulibaly",
     email: "aminata.coulibaly@santeplus.ci",
     phone: "+2250707070707",
     role: "secretaire",
-    password: "SantePlus@2026"
+    password: "SantePlus@2026",
   },
   {
     fullName: "M. Jean-Pierre Bamba",
     email: "jp.bamba@santeplus.ci",
     phone: "+2250707070708",
     role: "laboratoire",
-    password: "SantePlus@2026"
-  }
+    password: "SantePlus@2026",
+  },
 ];
 
 // Helper pour robustesse
-async function createDocumentRobust(collectionId: string, documentId: string, data: any, maxRetries = 10): Promise<any> {
+async function createDocumentRobust(
+  collectionId: string,
+  documentId: string,
+  data: any,
+  maxRetries = 10
+): Promise<any> {
   let currentData = { ...data };
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -96,7 +98,9 @@ async function createDocumentRobust(collectionId: string, documentId: string, da
         const match = errMsg.match(/Unknown attribute:\s*"?([^"\s]+)"?/i);
         if (match && match[1]) {
           const unknownAttr = match[1];
-          console.warn(`[Appwrite Schema Fallback] L'attribut "${unknownAttr}" est absent de la collection "${collectionId}". Retrait et nouvel essai.`);
+          console.warn(
+            `[Appwrite Schema Fallback] L'attribut "${unknownAttr}" est absent de la collection "${collectionId}". Retrait et nouvel essai.`
+          );
           delete currentData[unknownAttr];
           continue;
         }
@@ -112,25 +116,33 @@ async function runSeed() {
     for (const staff of STAFF_MEMBERS) {
       console.log(`\n👤 Traitement du membre : ${staff.fullName} (${staff.role})`);
       let userId = "";
-      
+
       // 1. Essayer de créer dans Appwrite Auth ou récupérer l'ID existant
       try {
-        const authRes = await users.create(ID.unique(), staff.email, staff.phone, undefined, staff.fullName);
+        const authRes = await users.create(
+          ID.unique(),
+          staff.email,
+          staff.phone,
+          undefined,
+          staff.fullName
+        );
         userId = authRes.$id;
         console.log(`   + Compte Auth créé avec succès. ID : ${userId}`);
-        
+
         // Mettre à jour le mot de passe
         await users.updatePassword(userId, staff.password);
         console.log(`   + Mot de passe défini.`);
       } catch (authErr: any) {
         if (authErr.message?.includes("already exists") || authErr.code === 409) {
-          console.log(`   ~ Le compte Auth existe déjà pour l'e-mail ${staff.email}. Recherche de l'utilisateur existant...`);
+          console.log(
+            `   ~ Le compte Auth existe déjà pour l'e-mail ${staff.email}. Recherche de l'utilisateur existant...`
+          );
           // Rechercher l'utilisateur par e-mail
           const listRes = await users.list([Query.equal("email", [staff.email])]);
           if (listRes.users.length > 0) {
             userId = listRes.users[0].$id;
             console.log(`   ~ Utilisateur existant trouvé. ID : ${userId}`);
-            
+
             // Forcer la mise à jour du mot de passe pour assurer qu'ils puissent se connecter avec la démo
             await users.updatePassword(userId, staff.password);
             console.log(`   + Mot de passe réinitialisé à la valeur par défaut pour la démo.`);
@@ -139,7 +151,9 @@ async function runSeed() {
             continue;
           }
         } else {
-          console.error(`   ❌ Erreur d'authentification pour ${staff.fullName} : ${authErr.message}`);
+          console.error(
+            `   ❌ Erreur d'authentification pour ${staff.fullName} : ${authErr.message}`
+          );
           continue;
         }
       }
@@ -161,11 +175,13 @@ async function runSeed() {
             role: staff.role,
             status: "actif",
             createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            updatedAt: new Date().toISOString(),
           };
 
           if (userDocExists) {
-            console.log(`   ~ Document de profil utilisateur existant trouvé dans la collection 'users'.`);
+            console.log(
+              `   ~ Document de profil utilisateur existant trouvé dans la collection 'users'.`
+            );
             // Mettre à jour pour s'assurer que le rôle est correct
             await databases.updateDocument(databaseId, "users", userId, profileData);
             console.log(`   + Document de profil utilisateur mis à jour.`);
@@ -175,16 +191,18 @@ async function runSeed() {
             console.log(`   + Nouveau document de profil créé dans la collection 'users'.`);
           }
         } catch (dbErr: any) {
-          console.error(`   ❌ Erreur lors de l'enregistrement de la base de données : ${dbErr.message}`);
+          console.error(
+            `   ❌ Erreur lors de l'enregistrement de la base de données : ${dbErr.message}`
+          );
         }
       }
     }
-    
+
     console.log("\n================================================================");
     console.log("🎉 TOUS LES COMPTES HOSPITALIERS ONT ÉTÉ CRÉÉS AVEC SUCCÈS !");
     console.log("================================================================");
     console.log("Informations de connexion générées :");
-    STAFF_MEMBERS.forEach(s => {
+    STAFF_MEMBERS.forEach((s) => {
       console.log(`- ${s.fullName} (${s.role.toUpperCase()})`);
       console.log(`  📧 E-mail : ${s.email}`);
       console.log(`  🔑 Mot de passe : ${s.password}`);

@@ -20,17 +20,23 @@ import AuthView from "./components/AuthView";
 export default function App() {
   const [authenticatedUser, setAuthenticatedUser] = useState<AppwriteUser | null>(null);
   const [authChecking, setAuthChecking] = useState<boolean>(true);
+  const [autoOpenAppointmentForm, setAutoOpenAppointmentForm] = useState<boolean>(false);
+  const [preselectedPatientId, setPreselectedPatientId] = useState<string | null>(null);
 
   const {
     currentUserRole,
     setCurrentUserRole,
     currentView,
     setCurrentView,
+    getHeaders,
     patients,
     appointments,
     inventory,
     invoices,
     complaints,
+    consultations,
+    prescriptions,
+    labRequests,
     auditLogs,
     addAuditLog,
     isOnline,
@@ -53,9 +59,14 @@ export default function App() {
     addComplaint,
     resolveComplaint,
     updateComplaintStatus,
+    addConsultation,
+    addPrescription,
+    updatePrescriptionStatus,
+    addLabRequest,
+    updateLabRequest,
     exportBackup,
-    importBackup
-  } = useAppState();
+    importBackup,
+  } = useAppState(authenticatedUser);
 
   // Tentative de reconnexion automatique au démarrage
   useEffect(() => {
@@ -72,6 +83,13 @@ export default function App() {
     }
     checkAuth();
   }, [setCurrentUserRole]);
+
+  // Verrouiller le rôle de l'utilisateur authentifié pour empêcher tout changement non autorisé
+  useEffect(() => {
+    if (authenticatedUser && currentUserRole !== authenticatedUser.role) {
+      setCurrentUserRole(authenticatedUser.role);
+    }
+  }, [authenticatedUser, currentUserRole, setCurrentUserRole]);
 
   // Route protection / fallback in case of role switching
   useEffect(() => {
@@ -104,7 +122,7 @@ export default function App() {
       userRole: user.role,
       action: "Connexion",
       details: "Connexion réussie au portail de l'hôpital",
-      status: "Succès"
+      status: "Succès",
     });
   };
 
@@ -116,7 +134,7 @@ export default function App() {
         userRole: authenticatedUser.role,
         action: "Déconnexion",
         details: "Déconnexion manuelle de la session de l'utilisateur",
-        status: "Succès"
+        status: "Succès",
       });
     }
     try {
@@ -147,9 +165,9 @@ export default function App() {
     switch (currentView) {
       case "accueil":
         return (
-          <WelcomeView 
-            currentUserRole={currentUserRole} 
-            setCurrentView={setCurrentView} 
+          <WelcomeView
+            currentUserRole={currentUserRole}
+            setCurrentView={setCurrentView}
             authenticatedUser={authenticatedUser}
             patients={patients}
             appointments={appointments}
@@ -157,6 +175,7 @@ export default function App() {
             addComplaint={addComplaint}
             addAppointment={addAppointment}
             updateAppointment={updateAppointment}
+            setAutoOpenAppointmentForm={setAutoOpenAppointmentForm}
           />
         );
       case "dashboard":
@@ -167,8 +186,14 @@ export default function App() {
             inventory={inventory}
             invoices={invoices}
             complaints={complaints}
+            consultations={consultations}
+            prescriptions={prescriptions}
+            labRequests={labRequests}
             setCurrentView={setCurrentView}
             currentUserRole={currentUserRole}
+            updateAppointment={updateAppointment}
+            authenticatedUser={authenticatedUser}
+            setAutoOpenAppointmentForm={setAutoOpenAppointmentForm}
           />
         );
       case "rendezvous":
@@ -176,20 +201,41 @@ export default function App() {
           <AppointmentsView
             appointments={appointments}
             patients={patients}
+            addPatient={addPatient}
             addAppointment={addAppointment}
             updateAppointment={updateAppointment}
             deleteAppointment={deleteAppointment}
             currentUserRole={currentUserRole}
+            addAuditLog={addAuditLog}
+            authenticatedUser={authenticatedUser}
+            autoOpenAddForm={autoOpenAppointmentForm}
+            setAutoOpenAddForm={setAutoOpenAppointmentForm}
+            preselectedPatientId={preselectedPatientId}
+            setPreselectedPatientId={setPreselectedPatientId}
           />
         );
       case "patients":
         return (
           <PatientsView
             patients={patients}
+            consultations={consultations}
+            prescriptions={prescriptions}
+            labRequests={labRequests}
             addPatient={addPatient}
             updatePatient={updatePatient}
             addMedicalHistoryEntry={addMedicalHistoryEntry}
+            addConsultation={addConsultation}
+            addPrescription={addPrescription}
+            addLabRequest={addLabRequest}
+            updateLabRequest={updateLabRequest}
             currentUserRole={currentUserRole}
+            addAuditLog={addAuditLog}
+            authenticatedUser={authenticatedUser}
+            onScheduleAppointment={(patientId) => {
+              setPreselectedPatientId(patientId);
+              setAutoOpenAppointmentForm(true);
+              setCurrentView("rendezvous");
+            }}
           />
         );
       case "stockbilling":
@@ -198,10 +244,12 @@ export default function App() {
             inventory={inventory}
             invoices={invoices}
             patients={patients}
+            prescriptions={prescriptions}
             updateStock={updateStock}
             addMedication={addMedication}
             addInvoice={addInvoice}
             markInvoiceAsPaid={markInvoiceAsPaid}
+            updatePrescriptionStatus={updatePrescriptionStatus}
             currentUserRole={currentUserRole}
             patientDossierNumber={authenticatedUser?.dossierNumber}
           />
@@ -217,7 +265,7 @@ export default function App() {
           />
         );
       case "assistantia":
-        return <AssistantIAView currentUserRole={currentUserRole} />;
+        return <AssistantIAView currentUserRole={currentUserRole} getHeaders={getHeaders} />;
       case "procedures":
         return <ProceduresView />;
       case "settings":
@@ -243,7 +291,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#f0f4f2] flex flex-col lg:flex-row font-sans" id="app-root">
-      
       {/* Sidebar Navigation */}
       <Navigation
         currentView={currentView}
@@ -262,12 +309,17 @@ export default function App() {
 
       {/* Main Container Viewport */}
       <div className="flex-1 flex flex-col min-w-0" id="main-wrapper">
-        
         {/* Top Header of the main area - perfectly matching High Density theme */}
-        <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0" id="main-header">
+        <header
+          className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0"
+          id="main-header"
+        >
           <div className="flex items-center space-x-3">
             <h1 className="text-sm sm:text-base md:text-lg font-bold text-slate-800 tracking-tight">
-              Bonjour, <span className="text-emerald-700 font-extrabold">{authenticatedUser?.fullName || currentUserRole}</span>
+              Bonjour,{" "}
+              <span className="text-emerald-700 font-extrabold">
+                {authenticatedUser?.fullName || currentUserRole}
+              </span>
             </h1>
             <span className="hidden sm:inline-block text-[10px] px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded border border-emerald-100 font-bold uppercase tracking-wider">
               Espace Clinique
@@ -277,8 +329,12 @@ export default function App() {
           <div className="flex items-center space-x-3">
             {/* Quick Actions based on Role */}
             {currentUserRole === UserRole.ACCUEIL && (
-              <button 
-                onClick={() => setCurrentView("rendezvous")}
+              <button
+                onClick={() => {
+                  setAutoOpenAppointmentForm(true);
+                  setPreselectedPatientId(null);
+                  setCurrentView("rendezvous");
+                }}
                 className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-bold transition-all shadow-xs cursor-pointer"
               >
                 + Nouveau RDV
@@ -286,7 +342,7 @@ export default function App() {
             )}
 
             {currentUserRole === UserRole.MEDECIN && (
-              <button 
+              <button
                 onClick={() => setCurrentView("patients")}
                 className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-bold transition-all shadow-xs cursor-pointer"
               >
@@ -295,7 +351,7 @@ export default function App() {
             )}
 
             {currentUserRole === UserRole.PHARMACIE && (
-              <button 
+              <button
                 onClick={() => setCurrentView("stockbilling")}
                 className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-bold transition-all shadow-xs cursor-pointer"
               >
@@ -304,8 +360,12 @@ export default function App() {
             )}
 
             <div className="flex items-center space-x-2 text-xs text-slate-500 font-semibold">
-              <span className={`w-2 h-2 rounded-full ${isOnline ? "bg-emerald-500" : "bg-amber-500"}`}></span>
-              <span className="hidden sm:inline">{isOnline ? "Internet Stable" : "Cache Local Actif"}</span>
+              <span
+                className={`w-2 h-2 rounded-full ${isOnline ? "bg-emerald-500" : "bg-amber-500"}`}
+              ></span>
+              <span className="hidden sm:inline">
+                {isOnline ? "Internet Stable" : "Cache Local Actif"}
+              </span>
             </div>
 
             {/* Logout button for all viewports in top header */}
@@ -321,24 +381,31 @@ export default function App() {
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6" id="main-content">
+        <main
+          className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6"
+          id="main-content"
+        >
           {renderCurrentView()}
         </main>
 
         {/* Elegant Professional Footer */}
-        <footer className="bg-white border-t border-slate-200/80 py-5 mt-auto text-slate-400 text-xs shrink-0" id="app-footer">
+        <footer
+          className="bg-white border-t border-slate-200/80 py-5 mt-auto text-slate-400 text-xs shrink-0"
+          id="app-footer"
+        >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="space-y-1 text-center sm:text-left">
               <p className="font-bold text-slate-700">Clinique Santé Plus</p>
-              <p className="text-[10px] text-slate-400">Portail sécurisé de gestion intégrée pour l'activité de soins cliniques.</p>
+              <p className="text-[10px] text-slate-400">
+                Portail sécurisé de gestion intégrée pour l'activité de soins cliniques.
+              </p>
             </div>
-            
+
             <div className="text-center sm:text-right text-[10px] text-slate-400">
               <p>© {new Date().getFullYear()} • Tous Droits Réservés • Abidjan, Côte d'Ivoire</p>
             </div>
           </div>
         </footer>
-
       </div>
     </div>
   );

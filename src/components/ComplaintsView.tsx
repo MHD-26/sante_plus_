@@ -1,8 +1,19 @@
 import React, { useState } from "react";
 import { Complaint, UserRole } from "../types";
-import { 
-  Frown, MessageSquare, AlertTriangle, CheckCircle, ThumbsUp, Star, 
-  Search, Plus, ShieldAlert, HeartPulse, Clock, FileText, Check
+import {
+  Frown,
+  MessageSquare,
+  AlertTriangle,
+  CheckCircle,
+  ThumbsUp,
+  Star,
+  Search,
+  Plus,
+  ShieldAlert,
+  HeartPulse,
+  Clock,
+  FileText,
+  Check,
 } from "lucide-react";
 
 interface ComplaintsViewProps {
@@ -18,14 +29,15 @@ export default function ComplaintsView({
   addComplaint,
   resolveComplaint,
   updateComplaintStatus,
-  currentUserRole
+  currentUserRole,
 }: ComplaintsViewProps) {
-  
   // UI States
   const [showAddForm, setShowAddForm] = useState(false);
-  const [selectedComplaintId, setSelectedComplaintId] = useState<string | null>(complaints[0]?.id || null);
+  const [selectedComplaintId, setSelectedComplaintId] = useState<string | null>(
+    complaints[0]?.id || null
+  );
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   // Form State: New Complaint
   const [patientName, setPatientName] = useState("");
   const [patientPhone, setPatientPhone] = useState("");
@@ -63,15 +75,15 @@ export default function ComplaintsView({
       patientPhone,
       category,
       description,
-      severity
+      severity,
     });
 
     alert(`Réclamation enregistrée avec succès sous la référence : ${newComp.id}`);
-    
+
     // Auto select
     setSelectedComplaintId(newComp.id);
     setShowAddForm(false);
-    
+
     // Reset Form
     setPatientName("");
     setPatientPhone("");
@@ -88,7 +100,7 @@ export default function ComplaintsView({
 
     resolveComplaint(selectedComplaintId, resolutionNotes, satisfactionScore);
     alert("La réclamation a été marquée comme résolue !");
-    
+
     // Clear and close
     setResolutionNotes("");
     setShowResolvePanel(false);
@@ -97,42 +109,55 @@ export default function ComplaintsView({
   // Helpers for badge styling
   const getSeverityBadge = (sev: Complaint["severity"]) => {
     switch (sev) {
-      case "Basse": return "bg-blue-50 text-blue-700 border-blue-200";
-      case "Moyenne": return "bg-amber-50 text-amber-700 border-amber-200";
-      case "Critique": return "bg-red-50 text-red-700 border-red-200";
+      case "Basse":
+        return "bg-blue-50 text-blue-700 border-blue-200";
+      case "Moyenne":
+        return "bg-amber-50 text-amber-700 border-amber-200";
+      case "Critique":
+        return "bg-red-50 text-red-700 border-red-200";
     }
   };
 
   const getStatusBadge = (status: Complaint["status"]) => {
     switch (status) {
-      case "Reçu": return "bg-blue-100 text-blue-800 border-blue-200";
-      case "En cours de traitement": return "bg-amber-100 text-amber-800 border-amber-200";
-      case "Résolu": return "bg-emerald-100 text-emerald-800 border-emerald-200";
+      case "Reçu":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "En cours de traitement":
+        return "bg-amber-100 text-amber-800 border-amber-200";
+      case "Résolu":
+        return "bg-emerald-100 text-emerald-800 border-emerald-200";
     }
   };
 
   // Calculate high level KPI stats
   const totalReceived = complaints.length;
-  const totalResolved = complaints.filter(c => c.status === "Résolu").length;
+  const totalResolved = complaints.filter((c) => c.status === "Résolu").length;
   const totalPending = totalReceived - totalResolved;
-  const resolvedList = complaints.filter(c => c.status === "Résolu" && c.satisfactionScore);
-  const avgSatisfaction = resolvedList.length > 0
-    ? (resolvedList.reduce((sum, c) => sum + (c.satisfactionScore || 5), 0) / resolvedList.length).toFixed(1)
-    : "4.5";
+  const resolvedList = complaints.filter((c) => c.status === "Résolu" && c.satisfactionScore);
+  const avgSatisfaction =
+    resolvedList.length > 0
+      ? (
+          resolvedList.reduce((sum, c) => sum + (c.satisfactionScore || 5), 0) / resolvedList.length
+        ).toFixed(1)
+      : "4.5";
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in">
-      
       {/* complaints Directory Left Panel */}
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <div>
             <h2 className="text-lg font-bold text-slate-800 font-display">Registre des Plaintes</h2>
-            <p className="text-[11px] text-slate-500 font-mono">Total : {totalReceived} reçues | {totalPending} en cours</p>
+            <p className="text-[11px] text-slate-500 font-mono">
+              Total : {totalReceived} reçues | {totalPending} en cours
+            </p>
           </div>
-          
+
           <button
-            onClick={() => { setShowAddForm(true); setShowResolvePanel(false); }}
+            onClick={() => {
+              setShowAddForm(true);
+              setShowResolvePanel(false);
+            }}
             className="inline-flex items-center space-x-1 p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-xs"
             title="Enregistrer un retour ou plainte patient"
           >
@@ -149,7 +174,7 @@ export default function ComplaintsView({
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full text-xs border border-slate-200 bg-white px-3 py-2.5 rounded-lg focus:outline-emerald-600"
           />
-          
+
           <div className="flex items-center space-x-2">
             <span className="font-bold text-slate-500">Filtrer par état :</span>
             <select
@@ -177,20 +202,30 @@ export default function ComplaintsView({
                   setShowResolvePanel(false);
                 }}
                 className={`w-full text-left p-4 flex justify-between items-start transition-all ${
-                  selectedComplaintId === c.id ? "bg-emerald-50/40 border-r-4 border-emerald-600" : "hover:bg-slate-50/50"
+                  selectedComplaintId === c.id
+                    ? "bg-emerald-50/40 border-r-4 border-emerald-600"
+                    : "hover:bg-slate-50/50"
                 }`}
               >
                 <div className="space-y-1 text-xs">
                   <div className="font-bold text-slate-800">{c.patientName}</div>
-                  <div className="text-[10px] text-slate-500 font-mono">Le {c.date} | {c.category}</div>
-                  <div className="text-[10px] text-slate-600 truncate max-w-[160px]">{c.description}</div>
+                  <div className="text-[10px] text-slate-500 font-mono">
+                    Le {c.date} | {c.category}
+                  </div>
+                  <div className="text-[10px] text-slate-600 truncate max-w-[160px]">
+                    {c.description}
+                  </div>
                 </div>
-                
+
                 <div className="text-right flex flex-col items-end space-y-1.5">
-                  <span className={`px-1.5 py-0.5 rounded text-[9px] border font-bold ${getSeverityBadge(c.severity)}`}>
+                  <span
+                    className={`px-1.5 py-0.5 rounded text-[9px] border font-bold ${getSeverityBadge(c.severity)}`}
+                  >
                     {c.severity}
                   </span>
-                  <span className={`px-1.5 py-0.5 rounded text-[9px] border font-bold ${getStatusBadge(c.status)}`}>
+                  <span
+                    className={`px-1.5 py-0.5 rounded text-[9px] border font-bold ${getStatusBadge(c.status)}`}
+                  >
                     {c.status}
                   </span>
                 </div>
@@ -208,7 +243,6 @@ export default function ComplaintsView({
 
       {/* Main Details Area or Add form */}
       <div className="lg:col-span-2">
-        
         {showAddForm ? (
           /* CREATE / SUBMIT NEW COMPLAINT FORM */
           <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-md space-y-4">
@@ -217,9 +251,14 @@ export default function ComplaintsView({
               <span>Enregistrer un Retour Patient / Réclamation</span>
             </h3>
 
-            <form onSubmit={handleSaveComplaint} className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <form
+              onSubmit={handleSaveComplaint}
+              className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs"
+            >
               <div className="space-y-1">
-                <label className="font-semibold text-slate-600">Nom complet du patient <span className="text-red-500">*</span></label>
+                <label className="font-semibold text-slate-600">
+                  Nom complet du patient <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
@@ -231,7 +270,9 @@ export default function ComplaintsView({
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-600">Numéro de téléphone <span className="text-red-500">*</span></label>
+                <label className="font-semibold text-slate-600">
+                  Numéro de téléphone <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="tel"
                   required
@@ -271,7 +312,9 @@ export default function ComplaintsView({
               </div>
 
               <div className="col-span-1 md:col-span-2 space-y-1">
-                <label className="font-semibold text-slate-600">Description détaillée de l'incident <span className="text-red-500">*</span></label>
+                <label className="font-semibold text-slate-600">
+                  Description détaillée de l'incident <span className="text-red-500">*</span>
+                </label>
                 <textarea
                   required
                   placeholder="Veuillez retranscrire fidèlement le témoignage ou l'observation du patient..."
@@ -302,30 +345,45 @@ export default function ComplaintsView({
         ) : selectedComplaint ? (
           /* DISPLAY DETAILED COMPLAINT SPEC SHEET */
           <div className="space-y-6">
-            
             {/* Top Sheet Banner */}
             <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div className="space-y-1 text-xs">
-                <span className="text-[10px] font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-500 font-bold">Réf: {selectedComplaint.id}</span>
-                <h3 className="text-lg font-bold text-slate-800 font-display">Réclamation de {selectedComplaint.patientName}</h3>
-                <p className="text-slate-500">Contact : <span className="font-semibold text-slate-700">{selectedComplaint.patientPhone}</span> | Enregistrée le : {selectedComplaint.date}</p>
+                <span className="text-[10px] font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-500 font-bold">
+                  Réf: {selectedComplaint.id}
+                </span>
+                <h3 className="text-lg font-bold text-slate-800 font-display">
+                  Réclamation de {selectedComplaint.patientName}
+                </h3>
+                <p className="text-slate-500">
+                  Contact :{" "}
+                  <span className="font-semibold text-slate-700">
+                    {selectedComplaint.patientPhone}
+                  </span>{" "}
+                  | Enregistrée le : {selectedComplaint.date}
+                </p>
               </div>
 
               <div className="flex flex-col items-end space-y-1.5">
                 <div className="flex space-x-1">
-                  <span className={`px-2 py-0.5 rounded text-[10px] border font-bold ${getSeverityBadge(selectedComplaint.severity)}`}>
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] border font-bold ${getSeverityBadge(selectedComplaint.severity)}`}
+                  >
                     Gravité : {selectedComplaint.severity}
                   </span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] border font-bold ${getStatusBadge(selectedComplaint.status)}`}>
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] border font-bold ${getStatusBadge(selectedComplaint.status)}`}
+                  >
                     État : {selectedComplaint.status}
                   </span>
                 </div>
-                
+
                 {/* Resolve status changer */}
                 {selectedComplaint.status !== "Résolu" && (
                   <div className="flex items-center space-x-1">
                     <button
-                      onClick={() => updateComplaintStatus(selectedComplaint.id, "En cours de traitement")}
+                      onClick={() =>
+                        updateComplaintStatus(selectedComplaint.id, "En cours de traitement")
+                      }
                       className="text-[10px] bg-amber-50 text-amber-800 px-2 py-1 rounded border border-amber-200 font-semibold hover:bg-amber-100"
                     >
                       Prendre en charge
@@ -354,11 +412,19 @@ export default function ComplaintsView({
 
             {/* RESOLUTION WORKSPACE PANEL */}
             {showResolvePanel && (
-              <form onSubmit={handleResolveComplaint} className="bg-white border border-slate-200 rounded-xl p-6 shadow-md space-y-4 animate-fade-in text-xs">
-                <h4 className="font-bold text-slate-800 border-b border-slate-100 pb-2">Clôturer et Résoudre l'incident</h4>
-                
+              <form
+                onSubmit={handleResolveComplaint}
+                className="bg-white border border-slate-200 rounded-xl p-6 shadow-md space-y-4 animate-fade-in text-xs"
+              >
+                <h4 className="font-bold text-slate-800 border-b border-slate-100 pb-2">
+                  Clôturer et Résoudre l'incident
+                </h4>
+
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-600">Actions correctives menées (Notes de résolution) <span className="text-red-500">*</span></label>
+                  <label className="font-semibold text-slate-600">
+                    Actions correctives menées (Notes de résolution){" "}
+                    <span className="text-red-500">*</span>
+                  </label>
                   <textarea
                     required
                     placeholder="Saisissez précisément les démarches effectuées (appel d'excuses, remboursement, formation d'accueil, etc.)..."
@@ -370,7 +436,9 @@ export default function ComplaintsView({
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-semibold text-slate-600">Score de Satisfaction Patient (1 à 5 étoiles) :</label>
+                  <label className="font-semibold text-slate-600">
+                    Score de Satisfaction Patient (1 à 5 étoiles) :
+                  </label>
                   <div className="flex items-center space-x-2">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
@@ -379,10 +447,14 @@ export default function ComplaintsView({
                         onClick={() => setSatisfactionScore(star)}
                         className="p-1 text-amber-400 hover:scale-110 transition-transform"
                       >
-                        <Star className={`w-6 h-6 ${star <= satisfactionScore ? "fill-amber-400 text-amber-400" : "text-slate-300"}`} />
+                        <Star
+                          className={`w-6 h-6 ${star <= satisfactionScore ? "fill-amber-400 text-amber-400" : "text-slate-300"}`}
+                        />
                       </button>
                     ))}
-                    <span className="font-bold text-slate-700 ml-2">Score : {satisfactionScore}/5</span>
+                    <span className="font-bold text-slate-700 ml-2">
+                      Score : {satisfactionScore}/5
+                    </span>
                   </div>
                 </div>
 
@@ -412,35 +484,36 @@ export default function ComplaintsView({
                     <CheckCircle className="w-5 h-5 text-emerald-600" />
                     <span>Dossier Résolu avec Succès</span>
                   </div>
-                  
+
                   {selectedComplaint.satisfactionScore && (
                     <div className="flex items-center space-x-1">
-                      <span className="text-slate-500 font-semibold text-[11px] mr-1">Satisfaction :</span>
+                      <span className="text-slate-500 font-semibold text-[11px] mr-1">
+                        Satisfaction :
+                      </span>
                       {Array.from({ length: selectedComplaint.satisfactionScore }).map((_, i) => (
                         <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                       ))}
                     </div>
                   )}
                 </div>
-                
+
                 <div className="text-xs space-y-1">
-                  <span className="font-extrabold text-emerald-950 uppercase tracking-wider text-[10px] block">Notes de clôture comptabilisées :</span>
+                  <span className="font-extrabold text-emerald-950 uppercase tracking-wider text-[10px] block">
+                    Notes de clôture comptabilisées :
+                  </span>
                   <p className="text-slate-700 font-sans leading-relaxed p-3 bg-white/60 border border-emerald-100 rounded-lg">
                     {selectedComplaint.resolutionNotes}
                   </p>
                 </div>
               </div>
             )}
-
           </div>
         ) : (
           <div className="p-12 text-center text-slate-400 bg-white border border-slate-100 rounded-xl shadow-xs">
             Sélectionnez une réclamation dans l'annuaire de gauche pour l'analyser.
           </div>
         )}
-
       </div>
-
     </div>
   );
 }

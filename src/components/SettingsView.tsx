@@ -1,7 +1,20 @@
 import React, { useState, useRef } from "react";
-import { 
-  Download, Upload, RefreshCw, Server, ShieldCheck, Wifi, Trash2, 
-  Database, Key, Shield, UserCheck, AlertTriangle, Search, Filter, ShieldAlert
+import {
+  Download,
+  Upload,
+  RefreshCw,
+  Server,
+  ShieldCheck,
+  Wifi,
+  Trash2,
+  Database,
+  Key,
+  Shield,
+  UserCheck,
+  AlertTriangle,
+  Search,
+  Filter,
+  ShieldAlert,
 } from "lucide-react";
 import { SyncAction, AuditLog } from "../types";
 
@@ -30,13 +43,12 @@ export default function SettingsView({
   isSyncing,
   lastSyncTime,
   auditLogs,
-  addAuditLog
+  addAuditLog,
 }: SettingsViewProps) {
-  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importStatus, setImportStatus] = useState<"idle" | "success" | "error">("idle");
   const [activeTab, setActiveTab] = useState<"infra" | "audit">("infra");
-  
+
   // Audit log filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [actionFilter, setActionFilter] = useState("all");
@@ -59,7 +71,7 @@ export default function SettingsView({
             userRole: "administrateur",
             action: "Modification importante",
             details: "Restauration complète de la base de données via fichier JSON",
-            status: "Succès"
+            status: "Succès",
           });
         } else {
           setImportStatus("error");
@@ -69,7 +81,7 @@ export default function SettingsView({
             userRole: "administrateur",
             action: "Modification importante",
             details: "Tentative échouée de restauration de la base de données (fichier corrompu)",
-            status: "Échec"
+            status: "Échec",
           });
         }
       }
@@ -85,7 +97,7 @@ export default function SettingsView({
       userRole: "administrateur",
       action: "Modification importante",
       details: "Exportation sécurisée des fiches médicales et administratives de la clinique",
-      status: "Succès"
+      status: "Succès",
     });
   };
 
@@ -97,17 +109,17 @@ export default function SettingsView({
       userRole: "administrateur",
       action: "Suppression",
       details: "Réinitialisation complète de la base de données clinique d'usine",
-      status: "Succès"
+      status: "Succès",
     });
   };
 
   // Filter logs
-  const filteredLogs = auditLogs.filter(log => {
-    const matchesSearch = 
+  const filteredLogs = auditLogs.filter((log) => {
+    const matchesSearch =
       log.userEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       log.details.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesAction = actionFilter === "all" || log.action === actionFilter;
     const matchesStatus = statusFilter === "all" || log.status === statusFilter;
 
@@ -116,39 +128,46 @@ export default function SettingsView({
 
   const getActionBadgeClass = (action: string) => {
     switch (action) {
-      case "Connexion": 
+      case "Connexion":
         return "bg-emerald-50 text-emerald-700 border-emerald-200";
-      case "Déconnexion": 
+      case "Déconnexion":
         return "bg-slate-50 text-slate-600 border-slate-200";
-      case "Création de compte": 
+      case "Création de compte":
         return "bg-teal-50 text-teal-700 border-teal-200";
-      case "Modification importante": 
+      case "Modification importante":
         return "bg-sky-50 text-sky-700 border-sky-200";
-      case "Suppression": 
+      case "Suppression":
         return "bg-rose-50 text-rose-700 border-rose-200";
-      case "Changement de permissions": 
+      case "Changement de permissions":
         return "bg-purple-50 text-purple-700 border-purple-200";
-      case "Accès refusé": 
+      case "Accès refusé":
         return "bg-amber-50 text-amber-700 border-amber-300";
-      default: 
+      case "Consultation Dossier":
+        return "bg-indigo-50 text-indigo-700 border-indigo-200";
+      case "Modification Ordonnance":
+        return "bg-amber-50 text-amber-700 border-amber-200";
+      case "Suppression Document":
+        return "bg-red-50 text-red-700 border-red-200";
+      default:
         return "bg-slate-100 text-slate-700 border-slate-200";
     }
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in" id="settings-view-container">
-      
+    <div
+      className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in"
+      id="settings-view-container"
+    >
       {/* Left panel: Main Configuration (Infra or Security) */}
       <div className="bg-white border border-slate-100 rounded-xl shadow-xs lg:col-span-2 overflow-hidden flex flex-col">
-        
         {/* Tab Headers */}
         <div className="bg-slate-50 border-b border-slate-100 flex items-center justify-between px-6 pt-3 shrink-0">
           <div className="flex space-x-6">
             <button
               onClick={() => setActiveTab("infra")}
               className={`pb-3 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer border-b-2 ${
-                activeTab === "infra" 
-                  ? "text-emerald-700 border-emerald-600" 
+                activeTab === "infra"
+                  ? "text-emerald-700 border-emerald-600"
                   : "text-slate-400 border-transparent hover:text-slate-600"
               }`}
             >
@@ -160,8 +179,8 @@ export default function SettingsView({
             <button
               onClick={() => setActiveTab("audit")}
               className={`pb-3 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer border-b-2 ${
-                activeTab === "audit" 
-                  ? "text-emerald-700 border-emerald-600" 
+                activeTab === "audit"
+                  ? "text-emerald-700 border-emerald-600"
                   : "text-slate-400 border-transparent hover:text-slate-600"
               }`}
             >
@@ -178,7 +197,6 @@ export default function SettingsView({
 
         {/* Tab Content */}
         <div className="p-6 flex-1 overflow-y-auto">
-          
           {activeTab === "infra" ? (
             <div className="space-y-6" id="tab-infra-content">
               <div className="border-b border-slate-100 pb-3">
@@ -186,11 +204,12 @@ export default function SettingsView({
                   <Database className="w-4 h-4 text-emerald-600" />
                   <span>Sauvegarde & Restauration de l'Infrastructure</span>
                 </h2>
-                <p className="text-[11px] text-slate-500">Gérez le stockage résilient local crypté avec synchronisation Appwrite.</p>
+                <p className="text-[11px] text-slate-500">
+                  Gérez le stockage résilient local crypté avec synchronisation Appwrite.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
-                
                 {/* Export Box */}
                 <div className="bg-slate-50 border border-slate-200/60 p-5 rounded-lg space-y-3 flex flex-col justify-between">
                   <div className="space-y-1">
@@ -199,10 +218,12 @@ export default function SettingsView({
                       <span>Exporter une sauvegarde</span>
                     </h4>
                     <p className="text-slate-500 leading-relaxed text-[11px]">
-                      Générez un fichier de sauvegarde JSON autonome contenant l'ensemble des données de la clinique (fiches patients, historiques médicaux, stocks, factures, plaintes).
+                      Générez un fichier de sauvegarde JSON autonome contenant l'ensemble des
+                      données de la clinique (fiches patients, historiques médicaux, stocks,
+                      factures, plaintes).
                     </p>
                   </div>
-                  
+
                   <button
                     onClick={handleExportClick}
                     className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded shadow-sm text-center cursor-pointer transition-colors"
@@ -219,7 +240,8 @@ export default function SettingsView({
                       <span>Importer une sauvegarde</span>
                     </h4>
                     <p className="text-slate-500 leading-relaxed text-[11px]">
-                      Restaurez l'ensemble des données de la clinique à partir d'un fichier de sauvegarde JSON précédemment téléchargé.
+                      Restaurez l'ensemble des données de la clinique à partir d'un fichier de
+                      sauvegarde JSON précédemment téléchargé.
                     </p>
                   </div>
 
@@ -237,16 +259,19 @@ export default function SettingsView({
                     >
                       Sélectionner un fichier JSON
                     </button>
-                    
+
                     {importStatus === "success" && (
-                      <p className="text-[10px] text-emerald-700 font-bold mt-1.5 text-center">✓ Base de données restaurée avec succès !</p>
+                      <p className="text-[10px] text-emerald-700 font-bold mt-1.5 text-center">
+                        ✓ Base de données restaurée avec succès !
+                      </p>
                     )}
                     {importStatus === "error" && (
-                      <p className="text-[10px] text-red-600 font-bold mt-1.5 text-center">✗ Fichier invalide ou corrompu.</p>
+                      <p className="text-[10px] text-red-600 font-bold mt-1.5 text-center">
+                        ✗ Fichier invalide ou corrompu.
+                      </p>
                     )}
                   </div>
                 </div>
-
               </div>
 
               {/* Destructive actions */}
@@ -257,7 +282,8 @@ export default function SettingsView({
                     <span>Zone d'Administration Sensible</span>
                   </h4>
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    La réinitialisation effacera toutes les fiches, factures et réclamations saisies récemment et rechargera les données fictives d'usine.
+                    La réinitialisation effacera toutes les fiches, factures et réclamations saisies
+                    récemment et rechargera les données fictives d'usine.
                   </p>
                 </div>
 
@@ -277,7 +303,10 @@ export default function SettingsView({
                     <ShieldCheck className="w-4 h-4 text-emerald-600" />
                     <span>Journal d'Audit & de Traçabilité Médicale</span>
                   </h2>
-                  <p className="text-[11px] text-slate-500">Conforme aux directives de sécurité des données de santé. Visualisez toutes les actions clés du personnel.</p>
+                  <p className="text-[11px] text-slate-500">
+                    Conforme aux directives de sécurité des données de santé. Visualisez toutes les
+                    actions clés du personnel.
+                  </p>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] px-2 py-0.5 bg-slate-100 border border-slate-200 font-mono text-slate-600 rounded">
@@ -313,6 +342,9 @@ export default function SettingsView({
                     <option value="Suppression">Suppressions</option>
                     <option value="Changement de permissions">Changements de permissions</option>
                     <option value="Accès refusé">Accès refusés</option>
+                    <option value="Consultation Dossier">Consultations de dossiers</option>
+                    <option value="Modification Ordonnance">Modifications d'ordonnances</option>
+                    <option value="Suppression Document">Suppressions de documents</option>
                   </select>
                   <Filter className="absolute right-2.5 top-2.5 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
                 </div>
@@ -340,13 +372,31 @@ export default function SettingsView({
                     </div>
                   ) : (
                     filteredLogs.map((log) => (
-                      <div key={log.id} className="p-4 hover:bg-slate-50 transition-colors text-xs space-y-2">
+                      <div
+                        key={log.id}
+                        className="p-4 hover:bg-slate-50 transition-colors text-xs space-y-2"
+                      >
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center space-x-2 flex-wrap">
                             <span className="font-bold text-slate-700">{log.userName}</span>
-                            <span className="text-[10px] text-slate-400 font-mono">({log.userRole})</span>
+                            <span className="text-[10px] text-slate-400 font-mono">
+                              ({log.userRole})
+                            </span>
                             <span className="text-[10px] text-slate-400">•</span>
-                            <span className="text-[10px] text-slate-400 font-mono">{log.userEmail}</span>
+                            <span className="text-[10px] text-slate-400 font-mono">
+                              {log.userEmail}
+                            </span>
+                            {log.ipAddress && (
+                              <>
+                                <span className="text-[10px] text-slate-400">•</span>
+                                <span
+                                  className="text-[10px] bg-slate-100 text-slate-600 border border-slate-200 px-1.5 py-0.5 rounded font-mono font-bold"
+                                  title="Adresse IP client"
+                                >
+                                  IP: {log.ipAddress}
+                                </span>
+                              </>
+                            )}
                           </div>
                           <span className="text-[10px] text-slate-400 font-mono font-medium">
                             {new Date(log.timestamp).toLocaleString("fr-FR")}
@@ -355,18 +405,24 @@ export default function SettingsView({
 
                         <div className="flex items-start justify-between gap-3">
                           <div className="space-y-1">
-                            <p className="text-slate-600 leading-relaxed font-medium">{log.details}</p>
+                            <p className="text-slate-600 leading-relaxed font-medium">
+                              {log.details}
+                            </p>
                           </div>
-                          
+
                           <div className="flex items-center space-x-1.5 shrink-0">
-                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${getActionBadgeClass(log.action)}`}>
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[9px] font-bold border ${getActionBadgeClass(log.action)}`}
+                            >
                               {log.action}
                             </span>
-                            <span className={`px-1.5 py-0.5 rounded text-[9px] font-black tracking-wider border ${
-                              log.status === "Succès" 
-                                ? "bg-emerald-50 text-emerald-800 border-emerald-200" 
-                                : "bg-red-50 text-red-800 border-red-200 animate-pulse"
-                            }`}>
+                            <span
+                              className={`px-1.5 py-0.5 rounded text-[9px] font-black tracking-wider border ${
+                                log.status === "Succès"
+                                  ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                                  : "bg-red-50 text-red-800 border-red-200 animate-pulse"
+                              }`}
+                            >
                               {log.status.toUpperCase()}
                             </span>
                           </div>
@@ -376,28 +432,29 @@ export default function SettingsView({
                   )}
                 </div>
               </div>
-              
+
               {/* Security Banner Info */}
               <div className="bg-emerald-50/55 border border-emerald-100 p-4 rounded-lg flex items-start space-x-3 text-xs text-emerald-800">
                 <Shield className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                 <div className="space-y-1 leading-relaxed">
-                  <p className="font-black text-emerald-900">Réglementation & Protection des Fiches de Soins</p>
+                  <p className="font-black text-emerald-900">
+                    Réglementation & Protection des Fiches de Soins
+                  </p>
                   <p className="text-[11px] text-emerald-700">
-                    Ce journal d'audit est à lecture seule pour la direction générale et les administrateurs agréés. Les tentatives d'altération, les élévations de privilèges ou les connexions suspectes génèrent automatiquement des alertes de sécurité prioritaires dans le tableau de bord d'Appwrite.
+                    Ce journal d'audit est à lecture seule pour la direction générale et les
+                    administrateurs agréés. Les tentatives d'altération, les élévations de
+                    privilèges ou les connexions suspectes génèrent automatiquement des alertes de
+                    sécurité prioritaires dans le tableau de bord d'Appwrite.
                   </p>
                 </div>
               </div>
-
             </div>
           )}
-
         </div>
-
       </div>
 
       {/* Right panel: Connection Sync simulation status & System Security Status */}
       <div className="space-y-6">
-        
         {/* Connection status */}
         <div className="bg-white border border-slate-100 rounded-xl p-6 shadow-xs space-y-6">
           <div className="border-b border-slate-100 pb-3">
@@ -405,15 +462,18 @@ export default function SettingsView({
               <Server className="w-5 h-5 text-slate-400" />
               <span>Statut Réseau & Cache</span>
             </h3>
-            <p className="text-[10px] text-slate-500">Contrôle de la résilience aux pannes Internet.</p>
+            <p className="text-[10px] text-slate-500">
+              Contrôle de la résilience aux pannes Internet.
+            </p>
           </div>
 
           <div className="space-y-4 text-xs font-medium text-slate-600">
-            
             <div className="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
               <span>État du Réseau :</span>
               <div className="flex items-center space-x-1.5">
-                <span className={`w-2.5 h-2.5 rounded-full ${isOnline ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`}></span>
+                <span
+                  className={`w-2.5 h-2.5 rounded-full ${isOnline ? "bg-emerald-500 animate-pulse" : "bg-amber-500"}`}
+                ></span>
                 <span className={`font-bold ${isOnline ? "text-emerald-700" : "text-amber-700"}`}>
                   {isOnline ? "Connecté (Stable)" : "Hors-ligne / Instable"}
                 </span>
@@ -422,7 +482,9 @@ export default function SettingsView({
 
             <div className="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
               <span>Actions en attente :</span>
-              <span className="font-mono font-bold text-slate-800">{syncQueue.length} transactions</span>
+              <span className="font-mono font-bold text-slate-800">
+                {syncQueue.length} transactions
+              </span>
             </div>
 
             <div className="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
@@ -434,7 +496,9 @@ export default function SettingsView({
               <button
                 onClick={toggleConnection}
                 className={`w-full py-2.5 text-white font-bold rounded-lg text-center cursor-pointer transition-all text-xs ${
-                  isOnline ? "bg-amber-600 hover:bg-amber-700" : "bg-emerald-600 hover:bg-emerald-700"
+                  isOnline
+                    ? "bg-amber-600 hover:bg-amber-700"
+                    : "bg-emerald-600 hover:bg-emerald-700"
                 }`}
               >
                 {isOnline ? "Passer en mode Hors-ligne" : "Simuler la reconnexion Internet"}
@@ -447,7 +511,9 @@ export default function SettingsView({
                   className="w-full py-2.5 bg-slate-100 border border-slate-200 text-slate-700 font-bold rounded-lg text-center flex items-center justify-center space-x-2 disabled:opacity-50 text-xs cursor-pointer"
                 >
                   <RefreshCw className={`w-4 h-4 ${isSyncing ? "animate-spin" : ""}`} />
-                  <span>{isSyncing ? "Synchronisation en cours..." : "Forcer la synchronisation"}</span>
+                  <span>
+                    {isSyncing ? "Synchronisation en cours..." : "Forcer la synchronisation"}
+                  </span>
                 </button>
               )}
             </div>
@@ -455,7 +521,9 @@ export default function SettingsView({
             {/* Sync transaction history preview */}
             {syncQueue.length > 0 && (
               <div className="space-y-1.5 pt-4 border-t border-slate-100">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Journal de synchronisation locale :</label>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Journal de synchronisation locale :
+                </label>
                 <div className="bg-slate-900 text-[10px] text-emerald-400 font-mono p-2.5 rounded max-h-32 overflow-y-auto space-y-1">
                   {syncQueue.map((act) => (
                     <div key={act.id}>
@@ -465,7 +533,6 @@ export default function SettingsView({
                 </div>
               </div>
             )}
-
           </div>
         </div>
 
@@ -476,34 +543,42 @@ export default function SettingsView({
               <ShieldAlert className="w-5 h-5 text-emerald-600 animate-pulse" />
               <span>Diagnostic de Sécurité Globale</span>
             </h3>
-            <p className="text-[10px] text-slate-500">Contrôle permanent des protocoles et accès.</p>
+            <p className="text-[10px] text-slate-500">
+              Contrôle permanent des protocoles et accès.
+            </p>
           </div>
 
           <div className="space-y-2.5 text-xs">
             <div className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 rounded">
               <span className="text-slate-500 font-medium">Authentification Appwrite Auth</span>
-              <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] uppercase tracking-wide rounded">Actif & Chiffré</span>
+              <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] uppercase tracking-wide rounded">
+                Actif & Chiffré
+              </span>
             </div>
-            
+
             <div className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 rounded">
               <span className="text-slate-500 font-medium">Contrôle RBAC (Rôles)</span>
-              <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] uppercase tracking-wide rounded">8/8 Profils Strict</span>
+              <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] uppercase tracking-wide rounded">
+                8/8 Profils Strict
+              </span>
             </div>
 
             <div className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 rounded">
               <span className="text-slate-500 font-medium">Double Protection Injection</span>
-              <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] uppercase tracking-wide rounded">Actif</span>
+              <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] uppercase tracking-wide rounded">
+                Actif
+              </span>
             </div>
 
             <div className="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 rounded">
               <span className="text-slate-500 font-medium">Anti Brute-Force & Lockout</span>
-              <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] uppercase tracking-wide rounded">Actif (5 tentative max)</span>
+              <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[9px] uppercase tracking-wide rounded">
+                Actif (5 tentative max)
+              </span>
             </div>
           </div>
         </div>
-
       </div>
-
     </div>
   );
 }

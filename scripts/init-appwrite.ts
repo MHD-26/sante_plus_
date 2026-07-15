@@ -14,8 +14,19 @@ console.log("🏥 SCRIPT D'INITIALISATION DE LA BASE DE DONNÉES SANTE_PLUS");
 console.log("================================================================");
 
 // Validation des variables d'environnement
-if (!endpoint || endpoint.includes("YOUR_APPWRITE_ENDPOINT") || !projectId || projectId.includes("remplir_ici") || !apiKey || apiKey.includes("remplir_ici") || !databaseId || databaseId.includes("remplir_ici")) {
-  console.error("❌ Erreur: Veuillez remplir correctement le fichier .env avant d'exécuter ce script.");
+if (
+  !endpoint ||
+  endpoint.includes("YOUR_APPWRITE_ENDPOINT") ||
+  !projectId ||
+  projectId.includes("remplir_ici") ||
+  !apiKey ||
+  apiKey.includes("remplir_ici") ||
+  !databaseId ||
+  databaseId.includes("remplir_ici")
+) {
+  console.error(
+    "❌ Erreur: Veuillez remplir correctement le fichier .env avant d'exécuter ce script."
+  );
   console.log("\nVariables actuelles :");
   console.log(`- APPWRITE_ENDPOINT : ${endpoint}`);
   console.log(`- APPWRITE_PROJECT_ID : ${projectId}`);
@@ -26,10 +37,7 @@ if (!endpoint || endpoint.includes("YOUR_APPWRITE_ENDPOINT") || !projectId || pr
 }
 
 // Initialisation du client Appwrite
-const client = new Client()
-  .setEndpoint(endpoint)
-  .setProject(projectId)
-  .setKey(apiKey);
+const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
 
 const databases = new Databases(client);
 
@@ -39,7 +47,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 // Helper de création de permissions
 function buildPermissions(readRoles: string[], writeRoles: string[]): string[] {
   const perms: string[] = [];
-  
+
   // Lecture
   for (const role of readRoles) {
     if (role === "any") {
@@ -120,32 +128,49 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
       { key: "email", type: "email", required: true },
       { key: "address", type: "string", size: 255, required: false },
       { key: "profilePhoto", type: "string", size: 500, required: false },
-      { 
-        key: "role", 
-        type: "enum", 
-        elements: ["patient", "medecin", "secretaire", "pharmacien", "laboratoire", "comptable", "administrateur", "directeur"],
+      {
+        key: "role",
+        type: "enum",
+        elements: [
+          "patient",
+          "medecin",
+          "secretaire",
+          "pharmacien",
+          "laboratoire",
+          "comptable",
+          "administrateur",
+          "directeur",
+        ],
         required: true,
-        defaultValue: "patient"
+        defaultValue: "patient",
       },
-      { 
-        key: "status", 
-        type: "enum", 
+      {
+        key: "status",
+        type: "enum",
         elements: ["actif", "inactif"],
         required: true,
-        defaultValue: "actif"
+        defaultValue: "actif",
       },
       { key: "createdAt", type: "string", size: 50, required: false },
-      { key: "updatedAt", type: "string", size: 50, required: false }
+      { key: "updatedAt", type: "string", size: 50, required: false },
     ],
     indexes: [
       { key: "idx_users_email", type: "unique", attributes: ["email"] },
-      { key: "idx_users_role", type: "key", attributes: ["role"] }
-    ]
+      { key: "idx_users_role", type: "key", attributes: ["role"] },
+    ],
   },
   {
     id: "patients",
     name: "Patients",
-    readRoles: ["administrateur", "directeur", "medecin", "secretaire", "pharmacien", "laboratoire", "comptable"],
+    readRoles: [
+      "administrateur",
+      "directeur",
+      "medecin",
+      "secretaire",
+      "pharmacien",
+      "laboratoire",
+      "comptable",
+    ],
     writeRoles: ["administrateur", "directeur", "secretaire", "medecin"],
     attributes: [
       { key: "dossierNumber", type: "string", size: 50, required: true },
@@ -153,14 +178,18 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
       { key: "allergies", type: "string", size: 1000, required: false },
       { key: "medicalHistory", type: "string", size: 2000, required: false },
       { key: "insurance", type: "string", size: 100, required: false },
-      { key: "emergencyContact", type: "string", size: 255, required: false }
+      { key: "emergencyContact", type: "string", size: 255, required: false },
     ],
-    indexes: [
-      { key: "idx_patients_dossier", type: "unique", attributes: ["dossierNumber"] }
-    ],
+    indexes: [{ key: "idx_patients_dossier", type: "unique", attributes: ["dossierNumber"] }],
     relations: [
-      { key: "user", relatedCollectionId: "users", type: "oneToOne", twoWay: false, onDelete: "setNull" }
-    ]
+      {
+        key: "user",
+        relatedCollectionId: "users",
+        type: "oneToOne",
+        twoWay: false,
+        onDelete: "setNull",
+      },
+    ],
   },
   {
     id: "appointments",
@@ -172,22 +201,32 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
       { key: "time", type: "string", size: 20, required: true },
       { key: "service", type: "string", size: 100, required: false },
       { key: "reason", type: "string", size: 255, required: true },
-      { 
-        key: "status", 
-        type: "enum", 
-        elements: ["en_attente", "confirme", "annule", "termine"], 
-        required: true, 
-        defaultValue: "en_attente" 
+      {
+        key: "status",
+        type: "enum",
+        elements: ["en_attente", "confirme", "annule", "termine"],
+        required: true,
+        defaultValue: "en_attente",
       },
-      { key: "observations", type: "string", size: 1000, required: false }
+      { key: "observations", type: "string", size: 1000, required: false },
     ],
-    indexes: [
-      { key: "idx_appointments_date", type: "key", attributes: ["date"] }
-    ],
+    indexes: [{ key: "idx_appointments_date", type: "key", attributes: ["date"] }],
     relations: [
-      { key: "patient", relatedCollectionId: "patients", type: "manyToOne", twoWay: false, onDelete: "cascade" },
-      { key: "doctor", relatedCollectionId: "users", type: "manyToOne", twoWay: false, onDelete: "setNull" }
-    ]
+      {
+        key: "patient",
+        relatedCollectionId: "patients",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "cascade",
+      },
+      {
+        key: "doctor",
+        relatedCollectionId: "users",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "setNull",
+      },
+    ],
   },
   {
     id: "consultations",
@@ -199,15 +238,25 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
       { key: "diagnosis", type: "string", size: 2000, required: true },
       { key: "treatment", type: "string", size: 2000, required: false },
       { key: "observations", type: "string", size: 2000, required: false },
-      { key: "date", type: "string", size: 50, required: true }
+      { key: "date", type: "string", size: 50, required: true },
     ],
-    indexes: [
-      { key: "idx_consultations_date", type: "key", attributes: ["date"] }
-    ],
+    indexes: [{ key: "idx_consultations_date", type: "key", attributes: ["date"] }],
     relations: [
-      { key: "patient", relatedCollectionId: "patients", type: "manyToOne", twoWay: false, onDelete: "cascade" },
-      { key: "doctor", relatedCollectionId: "users", type: "manyToOne", twoWay: false, onDelete: "setNull" }
-    ]
+      {
+        key: "patient",
+        relatedCollectionId: "patients",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "cascade",
+      },
+      {
+        key: "doctor",
+        relatedCollectionId: "users",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "setNull",
+      },
+    ],
   },
   {
     id: "medical_records",
@@ -220,11 +269,17 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
       { key: "medicalDocuments", type: "string", size: 3000, required: false },
       { key: "reports", type: "string", size: 3000, required: false },
       { key: "files", type: "string", size: 1000, required: false }, // liens de fichiers stockés
-      { key: "images", type: "string", size: 1000, required: false }
+      { key: "images", type: "string", size: 1000, required: false },
     ],
     relations: [
-      { key: "patient", relatedCollectionId: "patients", type: "oneToOne", twoWay: false, onDelete: "cascade" }
-    ]
+      {
+        key: "patient",
+        relatedCollectionId: "patients",
+        type: "oneToOne",
+        twoWay: false,
+        onDelete: "cascade",
+      },
+    ],
   },
   {
     id: "prescriptions",
@@ -234,13 +289,31 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
     attributes: [
       { key: "dosage", type: "string", size: 500, required: true },
       { key: "frequency", type: "string", size: 255, required: true },
-      { key: "duration", type: "string", size: 100, required: true }
+      { key: "duration", type: "string", size: 100, required: true },
     ],
     relations: [
-      { key: "consultation", relatedCollectionId: "consultations", type: "manyToOne", twoWay: false, onDelete: "cascade" },
-      { key: "patient", relatedCollectionId: "patients", type: "manyToOne", twoWay: false, onDelete: "cascade" },
-      { key: "doctor", relatedCollectionId: "users", type: "manyToOne", twoWay: false, onDelete: "setNull" }
-    ]
+      {
+        key: "consultation",
+        relatedCollectionId: "consultations",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "cascade",
+      },
+      {
+        key: "patient",
+        relatedCollectionId: "patients",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "cascade",
+      },
+      {
+        key: "doctor",
+        relatedCollectionId: "users",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "setNull",
+      },
+    ],
   },
   {
     id: "medications",
@@ -254,11 +327,9 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
       { key: "manufacturer", type: "string", size: 100, required: false },
       { key: "price", type: "float", required: true },
       { key: "code", type: "string", size: 50, required: true },
-      { key: "minQuantity", type: "integer", required: true, defaultValue: 10 }
+      { key: "minQuantity", type: "integer", required: true, defaultValue: 10 },
     ],
-    indexes: [
-      { key: "idx_medications_code", type: "unique", attributes: ["code"] }
-    ]
+    indexes: [{ key: "idx_medications_code", type: "unique", attributes: ["code"] }],
   },
   {
     id: "pharmacy_stock",
@@ -269,11 +340,17 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
       { key: "quantity", type: "integer", required: true, defaultValue: 0 },
       { key: "batchNumber", type: "string", size: 100, required: true },
       { key: "expirationDate", type: "string", size: 50, required: true },
-      { key: "location", type: "string", size: 100, required: false }
+      { key: "location", type: "string", size: 100, required: false },
     ],
     relations: [
-      { key: "medication", relatedCollectionId: "medications", type: "manyToOne", twoWay: false, onDelete: "cascade" }
-    ]
+      {
+        key: "medication",
+        relatedCollectionId: "medications",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "cascade",
+      },
+    ],
   },
   {
     id: "stock_movements",
@@ -281,20 +358,32 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
     readRoles: ["administrateur", "directeur", "pharmacien"],
     writeRoles: ["administrateur", "directeur", "pharmacien"],
     attributes: [
-      { 
-        key: "movementType", 
-        type: "enum", 
-        elements: ["entree", "sortie", "ajustement"], 
-        required: true 
+      {
+        key: "movementType",
+        type: "enum",
+        elements: ["entree", "sortie", "ajustement"],
+        required: true,
       },
       { key: "quantity", type: "integer", required: true },
       { key: "comment", type: "string", size: 255, required: false },
-      { key: "date", type: "string", size: 50, required: true }
+      { key: "date", type: "string", size: 50, required: true },
     ],
     relations: [
-      { key: "medication", relatedCollectionId: "medications", type: "manyToOne", twoWay: false, onDelete: "cascade" },
-      { key: "user", relatedCollectionId: "users", type: "manyToOne", twoWay: false, onDelete: "setNull" }
-    ]
+      {
+        key: "medication",
+        relatedCollectionId: "medications",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "cascade",
+      },
+      {
+        key: "user",
+        relatedCollectionId: "users",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "setNull",
+      },
+    ],
   },
   {
     id: "laboratory_tests",
@@ -303,19 +392,31 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
     writeRoles: ["administrateur", "directeur", "medecin", "laboratoire"],
     attributes: [
       { key: "testType", type: "string", size: 150, required: true },
-      { 
-        key: "status", 
-        type: "enum", 
-        elements: ["en_attente", "en_cours", "complete", "annule"], 
-        required: true, 
-        defaultValue: "en_attente" 
+      {
+        key: "status",
+        type: "enum",
+        elements: ["en_attente", "en_cours", "complete", "annule"],
+        required: true,
+        defaultValue: "en_attente",
       },
-      { key: "date", type: "string", size: 50, required: true }
+      { key: "date", type: "string", size: 50, required: true },
     ],
     relations: [
-      { key: "patient", relatedCollectionId: "patients", type: "manyToOne", twoWay: false, onDelete: "cascade" },
-      { key: "doctor", relatedCollectionId: "users", type: "manyToOne", twoWay: false, onDelete: "setNull" }
-    ]
+      {
+        key: "patient",
+        relatedCollectionId: "patients",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "cascade",
+      },
+      {
+        key: "doctor",
+        relatedCollectionId: "users",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "setNull",
+      },
+    ],
   },
   {
     id: "laboratory_results",
@@ -326,12 +427,24 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
       { key: "result", type: "string", size: 3000, required: true },
       { key: "comment", type: "string", size: 1000, required: false },
       { key: "file", type: "string", size: 500, required: false },
-      { key: "date", type: "string", size: 50, required: true }
+      { key: "date", type: "string", size: 50, required: true },
     ],
     relations: [
-      { key: "test", relatedCollectionId: "laboratory_tests", type: "oneToOne", twoWay: false, onDelete: "cascade" },
-      { key: "biologist", relatedCollectionId: "users", type: "manyToOne", twoWay: false, onDelete: "setNull" }
-    ]
+      {
+        key: "test",
+        relatedCollectionId: "laboratory_tests",
+        type: "oneToOne",
+        twoWay: false,
+        onDelete: "cascade",
+      },
+      {
+        key: "biologist",
+        relatedCollectionId: "users",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "setNull",
+      },
+    ],
   },
   {
     id: "invoices",
@@ -341,21 +454,25 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
     attributes: [
       { key: "invoiceNumber", type: "string", size: 50, required: true },
       { key: "amount", type: "float", required: true },
-      { 
-        key: "status", 
-        type: "enum", 
-        elements: ["paye", "en_attente", "annule", "partiel"], 
-        required: true, 
-        defaultValue: "en_attente" 
+      {
+        key: "status",
+        type: "enum",
+        elements: ["paye", "en_attente", "annule", "partiel"],
+        required: true,
+        defaultValue: "en_attente",
       },
-      { key: "date", type: "string", size: 50, required: true }
+      { key: "date", type: "string", size: 50, required: true },
     ],
-    indexes: [
-      { key: "idx_invoices_number", type: "unique", attributes: ["invoiceNumber"] }
-    ],
+    indexes: [{ key: "idx_invoices_number", type: "unique", attributes: ["invoiceNumber"] }],
     relations: [
-      { key: "patient", relatedCollectionId: "patients", type: "manyToOne", twoWay: false, onDelete: "cascade" }
-    ]
+      {
+        key: "patient",
+        relatedCollectionId: "patients",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "cascade",
+      },
+    ],
   },
   {
     id: "payments",
@@ -364,18 +481,24 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
     writeRoles: ["administrateur", "directeur", "comptable", "secretaire"],
     attributes: [
       { key: "amount", type: "float", required: true },
-      { 
-        key: "paymentMethod", 
-        type: "enum", 
-        elements: ["especes", "carte", "assurance", "mobile_money"], 
-        required: true 
+      {
+        key: "paymentMethod",
+        type: "enum",
+        elements: ["especes", "carte", "assurance", "mobile_money"],
+        required: true,
       },
       { key: "receipt", type: "string", size: 255, required: false },
-      { key: "date", type: "string", size: 50, required: true }
+      { key: "date", type: "string", size: 50, required: true },
     ],
     relations: [
-      { key: "invoice", relatedCollectionId: "invoices", type: "manyToOne", twoWay: false, onDelete: "cascade" }
-    ]
+      {
+        key: "invoice",
+        relatedCollectionId: "invoices",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "cascade",
+      },
+    ],
   },
   {
     id: "rooms",
@@ -384,25 +507,23 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
     writeRoles: ["administrateur", "directeur", "secretaire"],
     attributes: [
       { key: "number", type: "string", size: 30, required: true },
-      { 
-        key: "type", 
-        type: "enum", 
-        elements: ["individuelle", "double", "intensive", "suite"], 
-        required: true, 
-        defaultValue: "individuelle" 
+      {
+        key: "type",
+        type: "enum",
+        elements: ["individuelle", "double", "intensive", "suite"],
+        required: true,
+        defaultValue: "individuelle",
       },
       { key: "capacity", type: "integer", required: true, defaultValue: 1 },
-      { 
-        key: "status", 
-        type: "enum", 
-        elements: ["disponible", "occupe", "maintenance"], 
-        required: true, 
-        defaultValue: "disponible" 
-      }
+      {
+        key: "status",
+        type: "enum",
+        elements: ["disponible", "occupe", "maintenance"],
+        required: true,
+        defaultValue: "disponible",
+      },
     ],
-    indexes: [
-      { key: "idx_rooms_number", type: "unique", attributes: ["number"] }
-    ]
+    indexes: [{ key: "idx_rooms_number", type: "unique", attributes: ["number"] }],
   },
   {
     id: "hospitalizations",
@@ -412,13 +533,31 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
     attributes: [
       { key: "admissionDate", type: "string", size: 50, required: true },
       { key: "dischargeDate", type: "string", size: 50, required: false },
-      { key: "observations", type: "string", size: 2000, required: false }
+      { key: "observations", type: "string", size: 2000, required: false },
     ],
     relations: [
-      { key: "patient", relatedCollectionId: "patients", type: "manyToOne", twoWay: false, onDelete: "cascade" },
-      { key: "room", relatedCollectionId: "rooms", type: "manyToOne", twoWay: false, onDelete: "restrict" },
-      { key: "doctor", relatedCollectionId: "users", type: "manyToOne", twoWay: false, onDelete: "setNull" }
-    ]
+      {
+        key: "patient",
+        relatedCollectionId: "patients",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "cascade",
+      },
+      {
+        key: "room",
+        relatedCollectionId: "rooms",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "restrict",
+      },
+      {
+        key: "doctor",
+        relatedCollectionId: "users",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "setNull",
+      },
+    ],
   },
   {
     id: "departments",
@@ -427,11 +566,17 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
     writeRoles: ["administrateur", "directeur"],
     attributes: [
       { key: "name", type: "string", size: 100, required: true },
-      { key: "description", type: "string", size: 500, required: false }
+      { key: "description", type: "string", size: 500, required: false },
     ],
     relations: [
-      { key: "head", relatedCollectionId: "users", type: "manyToOne", twoWay: false, onDelete: "setNull" }
-    ]
+      {
+        key: "head",
+        relatedCollectionId: "users",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "setNull",
+      },
+    ],
   },
   {
     id: "notifications",
@@ -442,18 +587,24 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
       { key: "title", type: "string", size: 150, required: true },
       { key: "message", type: "string", size: 1000, required: true },
       { key: "type", type: "string", size: 50, required: false },
-      { 
-        key: "status", 
-        type: "enum", 
-        elements: ["non_lu", "lu"], 
-        required: true, 
-        defaultValue: "non_lu" 
+      {
+        key: "status",
+        type: "enum",
+        elements: ["non_lu", "lu"],
+        required: true,
+        defaultValue: "non_lu",
       },
-      { key: "date", type: "string", size: 50, required: true }
+      { key: "date", type: "string", size: 50, required: true },
     ],
     relations: [
-      { key: "recipient", relatedCollectionId: "users", type: "manyToOne", twoWay: false, onDelete: "cascade" }
-    ]
+      {
+        key: "recipient",
+        relatedCollectionId: "users",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "cascade",
+      },
+    ],
   },
   {
     id: "announcements",
@@ -464,12 +615,38 @@ const COLLECTIONS_SCHEMAS: CollectionSchema[] = [
       { key: "title", type: "string", size: 200, required: true },
       { key: "content", type: "string", size: 3000, required: true },
       { key: "visibility", type: "string", size: 50, required: false, defaultValue: "tous" },
-      { key: "date", type: "string", size: 50, required: true }
+      { key: "date", type: "string", size: 50, required: true },
     ],
     relations: [
-      { key: "author", relatedCollectionId: "users", type: "manyToOne", twoWay: false, onDelete: "setNull" }
-    ]
-  }
+      {
+        key: "author",
+        relatedCollectionId: "users",
+        type: "manyToOne",
+        twoWay: false,
+        onDelete: "setNull",
+      },
+    ],
+  },
+  {
+    id: "audit_logs",
+    name: "Journaux d'Audit",
+    readRoles: ["administrateur", "directeur"],
+    writeRoles: ["any"],
+    attributes: [
+      { key: "timestamp", type: "string", size: 50, required: true },
+      { key: "userEmail", type: "string", size: 100, required: false },
+      { key: "userName", type: "string", size: 100, required: false },
+      { key: "userRole", type: "string", size: 50, required: false },
+      { key: "action", type: "string", size: 100, required: true },
+      { key: "details", type: "string", size: 2000, required: true },
+      { key: "ipAddress", type: "string", size: 50, required: false },
+      { key: "status", type: "string", size: 20, required: false, defaultValue: "Succès" },
+    ],
+    indexes: [
+      { key: "idx_audit_logs_timestamp", type: "key", attributes: ["timestamp"] },
+      { key: "idx_audit_logs_action", type: "key", attributes: ["action"] },
+    ],
+  },
 ];
 
 // Fonction d'exécution principale
@@ -478,7 +655,7 @@ async function runSetup() {
     console.log(`📡 Connexion à l'instance Appwrite à l'adresse : ${endpoint}`);
     console.log(`🎯 ID de Projet : ${projectId}`);
     console.log(`🗄️ ID de la Base de Données : ${databaseId}`);
-    
+
     // Étape 1 : Vérifier la base de données
     try {
       await databases.get(databaseId);
@@ -491,12 +668,14 @@ async function runSetup() {
     }
 
     // Étape 2 : Créer toutes les collections (sans attributs pour l'instant pour éviter les conflits de clés étrangères)
-    console.log("\n📦 Étape 2 : Création des collections et configuration des rôles & permissions...");
+    console.log(
+      "\n📦 Étape 2 : Création des collections et configuration des rôles & permissions..."
+    );
     const createdCollections: Record<string, boolean> = {};
-    
+
     for (const schema of COLLECTIONS_SCHEMAS) {
       const perms = buildPermissions(schema.readRoles, schema.writeRoles);
-      
+
       try {
         await databases.getCollection(databaseId, schema.id);
         console.log(`   ~ Collection "${schema.name}" (${schema.id}) existe déjà.`);
@@ -504,17 +683,14 @@ async function runSetup() {
       } catch (err: any) {
         if (err.code === 404) {
           try {
-            await databases.createCollection(
-              databaseId,
-              schema.id,
-              schema.name,
-              perms
-            );
+            await databases.createCollection(databaseId, schema.id, schema.name, perms);
             console.log(`   + Collection "${schema.name}" (${schema.id}) créée avec succès.`);
             createdCollections[schema.id] = true;
             await delay(1000); // temporiser pour éviter les verrous de transactions
           } catch (createErr: any) {
-            console.error(`   ❌ Échec lors de la création de la collection "${schema.name}": ${createErr.message}`);
+            console.error(
+              `   ❌ Échec lors de la création de la collection "${schema.name}": ${createErr.message}`
+            );
           }
         } else {
           console.error(`   ❌ Erreur d'accès à la collection "${schema.id}": ${err.message}`);
@@ -526,9 +702,9 @@ async function runSetup() {
     console.log("\n📐 Étape 3 : Création des attributs de base (hors relations)...");
     for (const schema of COLLECTIONS_SCHEMAS) {
       if (!createdCollections[schema.id]) continue;
-      
+
       console.log(`\n📂 Traitement des attributs pour "${schema.name}" (${schema.id}) :`);
-      
+
       // Récupérer les attributs existants pour éviter d'ajouter des doublons
       let existingKeys: string[] = [];
       try {
@@ -632,9 +808,9 @@ async function runSetup() {
     console.log("\n🔗 Étape 4 : Création des relations natives entre les collections...");
     for (const schema of COLLECTIONS_SCHEMAS) {
       if (!createdCollections[schema.id] || !schema.relations) continue;
-      
+
       console.log(`\n📂 Traitement des relations pour "${schema.name}" (${schema.id}) :`);
-      
+
       let existingKeys: string[] = [];
       try {
         const currentColl = await databases.getCollection(databaseId, schema.id);
@@ -649,7 +825,9 @@ async function runSetup() {
 
         // S'assurer que la collection cible existe
         if (!createdCollections[rel.relatedCollectionId]) {
-          console.warn(`   ⚠️ Impossible de créer la relation "${rel.key}": collection cible "${rel.relatedCollectionId}" absente.`);
+          console.warn(
+            `   ⚠️ Impossible de créer la relation "${rel.key}": collection cible "${rel.relatedCollectionId}" absente.`
+          );
           continue;
         }
 
@@ -664,7 +842,9 @@ async function runSetup() {
             rel.relatedKey,
             rel.onDelete as any
           );
-          console.log(`   + Relation "${rel.key}" (${rel.type}) créée vers "${rel.relatedCollectionId}".`);
+          console.log(
+            `   + Relation "${rel.key}" (${rel.type}) créée vers "${rel.relatedCollectionId}".`
+          );
           await delay(1000); // Plus long délai pour les relations car elles s'appliquent aux deux collections
         } catch (relErr: any) {
           console.error(`   ❌ Erreur sur la relation "${rel.key}": ${relErr.message}`);
@@ -676,9 +856,9 @@ async function runSetup() {
     console.log("\n⚡ Étape 5 : Création des index d'optimisation des performances...");
     for (const schema of COLLECTIONS_SCHEMAS) {
       if (!createdCollections[schema.id] || !schema.indexes) continue;
-      
+
       console.log(`\n📂 Traitement des index pour "${schema.name}" (${schema.id}) :`);
-      
+
       let existingIndexes: string[] = [];
       try {
         const currentColl = await databases.getCollection(databaseId, schema.id);
@@ -700,7 +880,9 @@ async function runSetup() {
             indexDef.attributes,
             indexDef.orders as any
           );
-          console.log(`   + Index "${indexDef.key}" (${indexDef.type}) créé sur [${indexDef.attributes.join(", ")}].`);
+          console.log(
+            `   + Index "${indexDef.key}" (${indexDef.type}) créé sur [${indexDef.attributes.join(", ")}].`
+          );
           await delay(1000);
         } catch (indexErr: any) {
           console.error(`   ❌ Erreur sur l'index "${indexDef.key}": ${indexErr.message}`);
@@ -714,7 +896,6 @@ async function runSetup() {
     console.log("Toutes vos collections, attributs, permissions, index et relations");
     console.log("ont été configurés de manière optimale et robuste pour Santé Plus CI.");
     console.log("================================================================");
-
   } catch (error: any) {
     console.error("\n❌ Erreur critique lors de l'exécution du script :");
     console.error(error.message);

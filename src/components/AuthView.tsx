@@ -2,9 +2,21 @@ import React, { useState } from "react";
 import { authService, AppwriteUser, generateStrongPassword } from "../services/auth";
 import { isAppwriteConfigured } from "../lib/appwrite";
 import { UserRole } from "../types";
-import { 
-  ShieldCheck, Mail, Lock, Phone, User, Calendar, MapPin, 
-  Eye, EyeOff, Key, ChevronLeft, ArrowRight, Loader2, AlertCircle
+import {
+  ShieldCheck,
+  Mail,
+  Lock,
+  Phone,
+  User,
+  Calendar,
+  MapPin,
+  Eye,
+  EyeOff,
+  Key,
+  ChevronLeft,
+  ArrowRight,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import Logo from "./Logo";
 import { motion, AnimatePresence } from "motion/react";
@@ -21,7 +33,7 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [appwriteCorsError, setAppwriteCorsError] = useState<boolean>(false);
-  
+
   // Forgot password state
   const [forgotEmail, setForgotEmail] = useState<string>("");
   const [resetSent, setResetSent] = useState<boolean>(false);
@@ -70,7 +82,7 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
       phone: regPhone || "+225 0707070707",
       role: role,
       status: "actif",
-      dossierNumber: "PAT-" + Math.floor(100000 + Math.random() * 900000)
+      dossierNumber: "PAT-" + Math.floor(100000 + Math.random() * 900000),
     };
     onLoginSuccess(simulatedUser);
   };
@@ -122,16 +134,16 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
           email: loginId.includes("@") ? loginId : "demo@santeplus.ci",
           phone: "+225 0707070707",
           role: simulatedRole,
-          status: "actif"
+          status: "actif",
         };
-        
+
         onLoginSuccess(simulatedUser);
         return;
       }
 
       // Vraie connexion avec Appwrite
       const user = await authService.login(loginId, loginPassword);
-      
+
       if (user.status === "inactif") {
         throw new Error("Votre compte a été désactivé par l'administration.");
       }
@@ -147,15 +159,17 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
       onLoginSuccess(user);
     } catch (err: any) {
       console.error("Login error:", err);
-      const isNetwork = err.message && (
-        err.message.includes("fetch") || 
-        err.message.toLowerCase().includes("network") || 
-        err.message.toLowerCase().includes("failed to fetch") || 
-        err.name === "TypeError"
-      );
+      const isNetwork =
+        err.message &&
+        (err.message.includes("fetch") ||
+          err.message.toLowerCase().includes("network") ||
+          err.message.toLowerCase().includes("failed to fetch") ||
+          err.name === "TypeError");
       if (isNetwork) {
         setAppwriteCorsError(true);
-        setError("Impossible de joindre le serveur d'authentification Appwrite (Erreur de réseau / CORS).");
+        setError(
+          "Impossible de joindre le serveur d'authentification Appwrite (Erreur de réseau / CORS)."
+        );
       } else {
         setError(err.message || "Identifiants invalides ou erreur de connexion.");
       }
@@ -193,9 +207,11 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
           phone: regPhone,
           role: UserRole.PATIENT,
           status: "actif",
-          dossierNumber: "PAT-" + Math.floor(100000 + Math.random() * 900000)
+          dossierNumber: "PAT-" + Math.floor(100000 + Math.random() * 900000),
         };
-        alert(`Compte Patient créé (Simulation)\nNuméro de dossier attribué : ${simulatedUser.dossierNumber}`);
+        alert(
+          `Compte Patient créé (Simulation)\nNuméro de dossier attribué : ${simulatedUser.dossierNumber}`
+        );
         onLoginSuccess(simulatedUser);
         return;
       }
@@ -207,7 +223,7 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
         dateOfBirth: regBirthDate,
         gender: regGender,
         address: regAddress,
-        password: useGeneratedPassword ? undefined : regPassword
+        password: useGeneratedPassword ? undefined : regPassword,
       });
 
       if (user.mustChangePassword) {
@@ -219,12 +235,12 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
       }
     } catch (err: any) {
       console.error("Registration error:", err);
-      const isNetwork = err.message && (
-        err.message.includes("fetch") || 
-        err.message.toLowerCase().includes("network") || 
-        err.message.toLowerCase().includes("failed to fetch") || 
-        err.name === "TypeError"
-      );
+      const isNetwork =
+        err.message &&
+        (err.message.includes("fetch") ||
+          err.message.toLowerCase().includes("network") ||
+          err.message.toLowerCase().includes("failed to fetch") ||
+          err.name === "TypeError");
       if (isNetwork) {
         setAppwriteCorsError(true);
         setError("Impossible de s'inscrire (Erreur de réseau / CORS avec Appwrite).");
@@ -251,7 +267,9 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
     // Validation de la robustesse
     const pwdRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`|}{[\]:;?><,./-]).{12,}$/;
     if (!pwdRegex.test(newPassword)) {
-      setError("Le mot de passe doit contenir au moins 12 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.");
+      setError(
+        "Le mot de passe doit contenir au moins 12 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial."
+      );
       return;
     }
 
@@ -262,11 +280,11 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
       if (isAppwriteConfigured) {
         await authService.updatePassword(newPassword, tempUser?.id);
       }
-      
+
       if (tempUser) {
         onLoginSuccess({
           ...tempUser,
-          mustChangePassword: false
+          mustChangePassword: false,
         });
       }
     } catch (err: any) {
@@ -305,12 +323,14 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-teal-50 rounded-full mix-blend-multiply filter blur-3xl opacity-30 translate-x-1/2 translate-y-1/2"></div>
 
       <div className="w-full max-w-md bg-white border border-slate-200/80 rounded-2xl shadow-xl shadow-slate-100 p-6 sm:p-8 relative z-10">
-        
         {/* Status indicator for Appwrite config status */}
         {!isAppwriteConfigured && (
           <div className="mb-4 p-2 bg-amber-50 border border-amber-200 rounded-lg text-[10px] text-amber-700 font-bold flex items-center gap-1.5 leading-snug">
             <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-            <span>Mode Démo actif (Appwrite non connecté dans .env). Utilisez des identifiants factices pour naviguer.</span>
+            <span>
+              Mode Démo actif (Appwrite non connecté dans .env). Utilisez des identifiants factices
+              pour naviguer.
+            </span>
           </div>
         )}
 
@@ -375,7 +395,10 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
               className="space-y-6"
             >
               <button
-                onClick={() => { setScreen("landing"); setError(null); }}
+                onClick={() => {
+                  setScreen("landing");
+                  setError(null);
+                }}
                 className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 font-bold transition-all cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -397,28 +420,51 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{error}</span>
                   </div>
-                  
+
                   {appwriteCorsError && (
                     <div className="p-4 bg-amber-50 border border-amber-200/80 rounded-xl space-y-3 text-xs text-amber-900 leading-relaxed shadow-sm">
                       <div className="flex items-start gap-2">
                         <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
                         <div>
-                          <strong className="text-amber-800 font-bold block mb-1">Configuration de domaine manquante (CORS)</strong>
-                          <span>Appwrite requiert que le domaine actuel de l'application soit enregistré comme plateforme autorisée.</span>
+                          <strong className="text-amber-800 font-bold block mb-1">
+                            Configuration de domaine manquante (CORS)
+                          </strong>
+                          <span>
+                            Appwrite requiert que le domaine actuel de l'application soit enregistré
+                            comme plateforme autorisée.
+                          </span>
                         </div>
                       </div>
                       <div className="bg-white/90 border border-amber-100 p-3 rounded-lg space-y-1.5 text-[11px] text-slate-700 font-medium">
-                        <span className="font-bold text-slate-800 block">Pour configurer cela en 1 minute :</span>
+                        <span className="font-bold text-slate-800 block">
+                          Pour configurer cela en 1 minute :
+                        </span>
                         <ol className="list-decimal pl-4 space-y-1">
-                          <li>Allez sur la console <strong className="text-emerald-700">Appwrite</strong>.</li>
+                          <li>
+                            Allez sur la console{" "}
+                            <strong className="text-emerald-700">Appwrite</strong>.
+                          </li>
                           <li>Sélectionnez votre projet.</li>
-                          <li>Allez dans <strong className="text-slate-800">Paramètres</strong> &gt; <strong className="text-slate-800">Plateformes</strong>.</li>
-                          <li>Ajoutez une plateforme <strong className="text-emerald-700">Application Web (Web App)</strong>.</li>
-                          <li>Indiquez ce nom d'hôte : <code className="bg-slate-100 px-1.5 py-0.5 rounded font-bold text-red-600 font-mono">{window.location.hostname}</code></li>
+                          <li>
+                            Allez dans <strong className="text-slate-800">Paramètres</strong> &gt;{" "}
+                            <strong className="text-slate-800">Plateformes</strong>.
+                          </li>
+                          <li>
+                            Ajoutez une plateforme{" "}
+                            <strong className="text-emerald-700">Application Web (Web App)</strong>.
+                          </li>
+                          <li>
+                            Indiquez ce nom d'hôte :{" "}
+                            <code className="bg-slate-100 px-1.5 py-0.5 rounded font-bold text-red-600 font-mono">
+                              {window.location.hostname}
+                            </code>
+                          </li>
                         </ol>
                       </div>
                       <div className="pt-2 border-t border-amber-200/60 space-y-2">
-                        <p className="text-[10px] text-amber-700 font-bold">Sinon, bypasser et continuer d'explorer en un clic :</p>
+                        <p className="text-[10px] text-amber-700 font-bold">
+                          Sinon, bypasser et continuer d'explorer en un clic :
+                        </p>
                         <button
                           type="button"
                           onClick={() => handleBypassDemo(UserRole.PATIENT)}
@@ -465,7 +511,10 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
                     />
                   </div>
                   <span className="text-[10px] text-slate-400 leading-normal block">
-                    Exemples de démo locale : <strong className="text-slate-600">admin, medecin, secretaire, pharmacien, comptable</strong>
+                    Exemples de démo locale :{" "}
+                    <strong className="text-slate-600">
+                      admin, medecin, secretaire, pharmacien, comptable
+                    </strong>
                   </span>
                 </div>
 
@@ -476,7 +525,10 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
                     </label>
                     <button
                       type="button"
-                      onClick={() => { setScreen("forgot_password"); setError(null); }}
+                      onClick={() => {
+                        setScreen("forgot_password");
+                        setError(null);
+                      }}
                       className="text-[11px] text-emerald-700 hover:text-emerald-800 font-bold hover:underline cursor-pointer transition-colors"
                     >
                       Mot de passe oublié ?
@@ -531,7 +583,10 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
               className="space-y-6 max-h-[85vh] overflow-y-auto pr-1"
             >
               <button
-                onClick={() => { setScreen("landing"); setError(null); }}
+                onClick={() => {
+                  setScreen("landing");
+                  setError(null);
+                }}
                 className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 font-bold transition-all cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -553,28 +608,51 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{error}</span>
                   </div>
-                  
+
                   {appwriteCorsError && (
                     <div className="p-4 bg-amber-50 border border-amber-200/80 rounded-xl space-y-3 text-xs text-amber-900 leading-relaxed shadow-sm">
                       <div className="flex items-start gap-2">
                         <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
                         <div>
-                          <strong className="text-amber-800 font-bold block mb-1">Configuration de domaine manquante (CORS)</strong>
-                          <span>Appwrite requiert que le domaine actuel de l'application soit enregistré comme plateforme autorisée.</span>
+                          <strong className="text-amber-800 font-bold block mb-1">
+                            Configuration de domaine manquante (CORS)
+                          </strong>
+                          <span>
+                            Appwrite requiert que le domaine actuel de l'application soit enregistré
+                            comme plateforme autorisée.
+                          </span>
                         </div>
                       </div>
                       <div className="bg-white/90 border border-amber-100 p-3 rounded-lg space-y-1.5 text-[11px] text-slate-700 font-medium">
-                        <span className="font-bold text-slate-800 block">Pour configurer cela en 1 minute :</span>
+                        <span className="font-bold text-slate-800 block">
+                          Pour configurer cela en 1 minute :
+                        </span>
                         <ol className="list-decimal pl-4 space-y-1">
-                          <li>Allez sur la console <strong className="text-emerald-700">Appwrite</strong>.</li>
+                          <li>
+                            Allez sur la console{" "}
+                            <strong className="text-emerald-700">Appwrite</strong>.
+                          </li>
                           <li>Sélectionnez votre projet.</li>
-                          <li>Allez dans <strong className="text-slate-800">Paramètres</strong> &gt; <strong className="text-slate-800">Plateformes</strong>.</li>
-                          <li>Ajoutez une plateforme <strong className="text-emerald-700">Application Web (Web App)</strong>.</li>
-                          <li>Indiquez ce nom d'hôte : <code className="bg-slate-100 px-1.5 py-0.5 rounded font-bold text-red-600 font-mono">{window.location.hostname}</code></li>
+                          <li>
+                            Allez dans <strong className="text-slate-800">Paramètres</strong> &gt;{" "}
+                            <strong className="text-slate-800">Plateformes</strong>.
+                          </li>
+                          <li>
+                            Ajoutez une plateforme{" "}
+                            <strong className="text-emerald-700">Application Web (Web App)</strong>.
+                          </li>
+                          <li>
+                            Indiquez ce nom d'hôte :{" "}
+                            <code className="bg-slate-100 px-1.5 py-0.5 rounded font-bold text-red-600 font-mono">
+                              {window.location.hostname}
+                            </code>
+                          </li>
                         </ol>
                       </div>
                       <div className="pt-2 border-t border-amber-200/60 space-y-2">
-                        <p className="text-[10px] text-amber-700 font-bold">Sinon, bypasser et continuer d'explorer en un clic :</p>
+                        <p className="text-[10px] text-amber-700 font-bold">
+                          Sinon, bypasser et continuer d'explorer en un clic :
+                        </p>
                         <button
                           type="button"
                           onClick={() => handleBypassDemo(UserRole.PATIENT)}
@@ -721,7 +799,10 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
                       }}
                       className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                     />
-                    <label htmlFor="chk-gen-password" className="text-[11px] font-bold text-slate-600 cursor-pointer select-none">
+                    <label
+                      htmlFor="chk-gen-password"
+                      className="text-[11px] font-bold text-slate-600 cursor-pointer select-none"
+                    >
                       Générer un mot de passe fort temporaire
                     </label>
                   </div>
@@ -735,7 +816,8 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
                         {generatedPass}
                       </div>
                       <span className="text-[9px] text-emerald-700/80 block leading-snug font-medium">
-                        🔑 Vous devrez impérativement modifier ce mot de passe temporaire lors de votre première connexion.
+                        🔑 Vous devrez impérativement modifier ce mot de passe temporaire lors de
+                        votre première connexion.
                       </span>
                     </div>
                   ) : (
@@ -793,7 +875,8 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
                   Changement de mot de passe requis
                 </h2>
                 <p className="text-xs text-slate-400 max-w-sm">
-                  Pour des raisons de sécurité, vous devez remplacer votre mot de passe temporaire par un nouveau mot de passe fort personnel.
+                  Pour des raisons de sécurité, vous devez remplacer votre mot de passe temporaire
+                  par un nouveau mot de passe fort personnel.
                 </p>
               </div>
 
@@ -841,7 +924,9 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
 
                 {/* Exigences de sécurité */}
                 <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-100 space-y-1.5 text-[10px] text-slate-500 font-medium leading-relaxed">
-                  <span className="font-bold text-slate-600 block mb-0.5">Le mot de passe doit respecter :</span>
+                  <span className="font-bold text-slate-600 block mb-0.5">
+                    Le mot de passe doit respecter :
+                  </span>
                   <p>✔ Au moins 12 caractères de longueur</p>
                   <p>✔ Au moins une lettre majuscule & une lettre minuscule</p>
                   <p>✔ Au moins un chiffre (0-9) & un caractère spécial (ex: @, !, #)</p>
@@ -875,7 +960,11 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
               className="space-y-6"
             >
               <button
-                onClick={() => { setScreen("login"); setResetSent(false); setError(null); }}
+                onClick={() => {
+                  setScreen("login");
+                  setResetSent(false);
+                  setError(null);
+                }}
                 className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 font-bold transition-all cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
@@ -887,7 +976,8 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
                   Récupération sécurisée
                 </h2>
                 <p className="text-xs text-slate-400">
-                  Saisissez l'e-mail de votre compte pour recevoir un lien de réinitialisation sécurisé.
+                  Saisissez l'e-mail de votre compte pour recevoir un lien de réinitialisation
+                  sécurisé.
                 </p>
               </div>
 
@@ -895,10 +985,12 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
                 <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-xs text-emerald-800 leading-relaxed space-y-2">
                   <p className="font-bold text-emerald-900">✓ Lien d'authentification envoyé</p>
                   <p>
-                    Un e-mail de réinitialisation sécurisé contenant un jeton d'accès unique temporaire à usage unique a été envoyé à <strong>{forgotEmail}</strong>.
+                    Un e-mail de réinitialisation sécurisé contenant un jeton d'accès unique
+                    temporaire à usage unique a été envoyé à <strong>{forgotEmail}</strong>.
                   </p>
                   <p className="text-[10px] text-emerald-600 font-bold">
-                    Pour préserver la confidentialité, ce lien expirera automatiquement sous 1 heure.
+                    Pour préserver la confidentialité, ce lien expirera automatiquement sous 1
+                    heure.
                   </p>
                 </div>
               ) : (
@@ -946,7 +1038,6 @@ export default function AuthView({ onLoginSuccess }: AuthViewProps) {
             </motion.div>
           )}
         </AnimatePresence>
-
       </div>
     </div>
   );
