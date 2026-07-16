@@ -12,6 +12,7 @@ import {
   Consultation,
   Prescription,
   LabRequest,
+  LabReagent,
 } from "./types";
 import {
   INITIAL_PATIENTS,
@@ -22,6 +23,7 @@ import {
   INITIAL_CONSULTATIONS,
   INITIAL_PRESCRIPTIONS,
   INITIAL_LAB_REQUESTS,
+  INITIAL_LAB_REAGENTS,
 } from "./data";
 
 export function useAppState(authenticatedUser?: any) {
@@ -59,6 +61,7 @@ export function useAppState(authenticatedUser?: any) {
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [labRequests, setLabRequests] = useState<LabRequest[]>([]);
+  const [labReagents, setLabReagents] = useState<LabReagent[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
 
   // Connection and synchronization states (Simulation of unstable connection)
@@ -104,6 +107,7 @@ export function useAppState(authenticatedUser?: any) {
       const storedConsultations = localStorage.getItem("csp_consultations");
       const storedPrescriptions = localStorage.getItem("csp_prescriptions");
       const storedLabRequests = localStorage.getItem("csp_lab_requests");
+      const storedLabReagents = localStorage.getItem("csp_lab_reagents");
       const storedRole = localStorage.getItem("csp_role");
       const storedSyncQueue = localStorage.getItem("csp_sync_queue");
       const storedOnline = localStorage.getItem("csp_online");
@@ -121,6 +125,7 @@ export function useAppState(authenticatedUser?: any) {
         storedPrescriptions ? JSON.parse(storedPrescriptions) : INITIAL_PRESCRIPTIONS
       );
       setLabRequests(storedLabRequests ? JSON.parse(storedLabRequests) : INITIAL_LAB_REQUESTS);
+      setLabReagents(storedLabReagents ? JSON.parse(storedLabReagents) : INITIAL_LAB_REAGENTS);
 
       const defaultAuditLogs: AuditLog[] = [
         {
@@ -170,6 +175,7 @@ export function useAppState(authenticatedUser?: any) {
       setConsultations(INITIAL_CONSULTATIONS);
       setPrescriptions(INITIAL_PRESCRIPTIONS);
       setLabRequests(INITIAL_LAB_REQUESTS);
+      setLabReagents(INITIAL_LAB_REAGENTS);
     }
   }, []);
 
@@ -205,6 +211,10 @@ export function useAppState(authenticatedUser?: any) {
   useEffect(() => {
     localStorage.setItem("csp_lab_requests", JSON.stringify(labRequests));
   }, [labRequests]);
+
+  useEffect(() => {
+    localStorage.setItem("csp_lab_reagents", JSON.stringify(labReagents));
+  }, [labReagents]);
 
   useEffect(() => {
     localStorage.setItem("csp_role", currentUserRole);
@@ -730,6 +740,7 @@ export function useAppState(authenticatedUser?: any) {
       consultations,
       prescriptions,
       labRequests,
+      labReagents,
     };
 
     const dataStr =
@@ -760,6 +771,7 @@ export function useAppState(authenticatedUser?: any) {
       if (backup.consultations) setConsultations(backup.consultations);
       if (backup.prescriptions) setPrescriptions(backup.prescriptions);
       if (backup.labRequests) setLabRequests(backup.labRequests);
+      if (backup.labReagents) setLabReagents(backup.labReagents);
 
       localStorage.setItem("csp_patients", JSON.stringify(backup.patients));
       localStorage.setItem("csp_appointments", JSON.stringify(backup.appointments));
@@ -773,6 +785,8 @@ export function useAppState(authenticatedUser?: any) {
         localStorage.setItem("csp_prescriptions", JSON.stringify(backup.prescriptions));
       if (backup.labRequests)
         localStorage.setItem("csp_lab_requests", JSON.stringify(backup.labRequests));
+      if (backup.labReagents)
+        localStorage.setItem("csp_lab_reagents", JSON.stringify(backup.labReagents));
 
       alert("Sauvegarde restaurée avec succès !");
       return true;
@@ -802,6 +816,8 @@ export function useAppState(authenticatedUser?: any) {
     consultations,
     prescriptions,
     labRequests,
+    labReagents,
+    setLabReagents,
     auditLogs,
     addAuditLog,
 

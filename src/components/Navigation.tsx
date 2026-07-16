@@ -20,6 +20,7 @@ import {
   Menu,
   X,
   LogOut,
+  FlaskConical,
 } from "lucide-react";
 import Logo from "./Logo";
 
@@ -62,6 +63,12 @@ export default function Navigation({
       label: "Tableau de Bord",
       icon: LayoutDashboard,
       roles: [UserRole.ADMIN, UserRole.DIRECTION, UserRole.COMPTABLE],
+    },
+    {
+      id: "laboratory",
+      label: "Laboratoire",
+      icon: FlaskConical,
+      roles: [UserRole.ADMIN, UserRole.DIRECTION, UserRole.MEDECIN, UserRole.LABORATOIRE],
     },
     {
       id: "rendezvous",

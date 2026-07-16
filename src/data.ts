@@ -478,3 +478,55 @@ export const INITIAL_LAB_REQUESTS: any[] = [
     status: "En attente",
   },
 ];
+
+export const INITIAL_LAB_REAGENTS: any[] = [
+  {
+    id: "REA-001",
+    name: "Réactif TDR Paludisme",
+    quantity: 50,
+    unit: "tests",
+    threshold: 10,
+    expiryDate: "2027-01-15",
+  },
+  {
+    id: "REA-002",
+    name: "Colorant de Giemsa (Goutte Épaisse)",
+    quantity: 5,
+    unit: "flacons",
+    threshold: 2,
+    expiryDate: "2026-12-20",
+  },
+  {
+    id: "REA-003",
+    name: "Tubes EDTA (NFS / Sang total)",
+    quantity: 150,
+    unit: "pièces",
+    threshold: 35,
+    expiryDate: "2028-06-30",
+  },
+  {
+    id: "REA-004",
+    name: "Antigènes de Widal & Félix (O et H)",
+    quantity: 8,
+    unit: "flacons",
+    threshold: 2,
+    expiryDate: "2026-10-05",
+  },
+  {
+    id: "REA-005",
+    name: "Bandelettes Glycémie",
+    quantity: 200,
+    unit: "tests",
+    threshold: 50,
+    expiryDate: "2027-03-12",
+  },
+  {
+    id: "REA-006",
+    name: "Tubes secs (Séro diagnostic)",
+    quantity: 250,
+    unit: "pièces",
+    threshold: 40,
+    expiryDate: "2028-09-15",
+  },
+];
+

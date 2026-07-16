@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UserRole, Patient, Appointment, Invoice, Complaint } from "../types";
+import { UserRole, Patient, Appointment, Invoice, Complaint, LabRequest } from "../types";
 import { AppwriteUser } from "../services/auth";
 import {
   ArrowRight,
@@ -28,6 +28,7 @@ import {
   Clipboard,
   AlertCircle,
   Sparkles,
+  QrCode,
 } from "lucide-react";
 import Logo from "./Logo";
 
@@ -38,6 +39,7 @@ interface WelcomeViewProps {
   patients?: Patient[];
   appointments?: Appointment[];
   invoices?: Invoice[];
+  labRequests?: LabRequest[];
   addComplaint?: (comp: Omit<Complaint, "id" | "date" | "status">) => Complaint;
   addAppointment?: (app: Omit<Appointment, "id">) => Appointment;
   updateAppointment?: (app: Appointment) => void;
@@ -51,6 +53,7 @@ export default function WelcomeView({
   patients = [],
   appointments = [],
   invoices = [],
+  labRequests = [],
   addComplaint,
   addAppointment,
   updateAppointment,
@@ -191,7 +194,7 @@ export default function WelcomeView({
   ];
 
   // --- ESPACE PATIENT LOGIQUE ---
-  const [patientTab, setPatientTab] = useState<"dossier" | "rdv" | "factures" | "reclamation">(
+  const [patientTab, setPatientTab] = useState<"dossier" | "rdv" | "factures" | "reclamation" | "analyses">(
     "dossier"
   );
 
@@ -271,6 +274,15 @@ export default function WelcomeView({
       inv.patientId === activePatient.id ||
       (inv.patientName.toLowerCase().includes(activePatient.firstName.toLowerCase()) &&
         inv.patientName.toLowerCase().includes(activePatient.lastName.toLowerCase()))
+    );
+  });
+
+  // Filtrer les analyses de labo du patient
+  const myLabRequests = labRequests.filter((req) => {
+    return (
+      req.patientId === activePatient.id ||
+      (req.patientName.toLowerCase().includes(activePatient.firstName.toLowerCase()) &&
+        req.patientName.toLowerCase().includes(activePatient.lastName.toLowerCase()))
     );
   });
 
@@ -448,6 +460,17 @@ export default function WelcomeView({
             >
               <FileText className="w-4 h-4" />
               <span>Mes Factures ({myInvoices.length})</span>
+            </button>
+            <button
+              onClick={() => setPatientTab("analyses")}
+              className={`px-4 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                patientTab === "analyses"
+                  ? "bg-[#065f46] text-white shadow-sm"
+                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+              }`}
+            >
+              <FlaskConical className="w-4 h-4" />
+              <span>Mes Analyses Labo ({myLabRequests.length})</span>
             </button>
             <button
               onClick={() => setPatientTab("reclamation")}
@@ -901,6 +924,120 @@ export default function WelcomeView({
                   </form>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* TAB 5: LABORATORY ANALYSIS RESULTS */}
+          {patientTab === "analyses" && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-800 tracking-tight">
+                  Vos Analyses de Laboratoire
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Consultez en toute transparence l'état d'avancement de vos examens de sang, urine et autres prélèvements prescrits par nos médecins.
+                </p>
+              </div>
+
+              {myLabRequests.length > 0 ? (
+                <div className="space-y-4">
+                  {myLabRequests.map((req) => (
+                    <div
+                      key={req.id}
+                      className="bg-slate-50 border border-slate-200/60 hover:border-slate-300 rounded-xl p-5 space-y-4 transition-all"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/40 pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-black text-slate-700 bg-white border border-slate-200 px-2.5 py-0.5 rounded-md font-mono">
+                            {req.id}
+                          </span>
+                          <span className="text-xs font-bold text-[#065f46]">
+                            Prescrit par : {req.doctorName}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-slate-400">{req.date}</span>
+                          {req.status === "En attente" && (
+                            <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-100">
+                              À PRÉLEVER
+                            </span>
+                          )}
+                          {req.status === "En cours" && (
+                            <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2.5 py-0.5 rounded-full border border-indigo-100 animate-pulse">
+                              EN ANALYSE
+                            </span>
+                          )}
+                          {req.status === "Prêt" && (
+                            <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100">
+                              RÉSULTATS PRÊTS
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Sample details */}
+                      {req.sampleId && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-white/60 p-3 rounded-lg border border-slate-200/50 leading-relaxed font-mono">
+                          <div>Code Prélèvement : <strong className="text-slate-700">{req.sampleId}</strong></div>
+                          <div>Échantillon : <strong className="text-slate-700">{req.sampleType}</strong> (reçu le {req.sampleCollectedAt})</div>
+                        </div>
+                      )}
+
+                      {/* Individual Test results */}
+                      <div className="space-y-2">
+                        {req.tests.map((test, index) => (
+                          <div
+                            key={index}
+                            className="bg-white border border-slate-200/50 rounded-lg p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-2xs"
+                          >
+                            <div className="space-y-0.5">
+                              <span className="text-xs font-bold text-slate-700">{test.name}</span>
+                              {test.status === "Prêt" && test.referenceRange && (
+                                <span className="text-[10px] text-slate-400 block font-mono">Plage de référence : {test.referenceRange}</span>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                              {test.status === "Prêt" && test.result ? (
+                                <div className="text-right">
+                                  <span className={`text-sm font-mono font-black ${test.isAbnormal ? "text-rose-600 underline" : "text-emerald-700 font-bold"}`}>
+                                    {test.result}
+                                  </span>
+                                  {test.isAbnormal && (
+                                    <span className="text-[9px] font-black bg-rose-100 text-rose-800 border border-rose-200 px-1.5 py-0.5 rounded-xs block mt-1 w-fit ml-auto">
+                                      HORS PLAGE ⚠️
+                                    </span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-xs text-slate-400 italic">En cours de traitement...</span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Medical signature */}
+                      {req.status === "Prêt" && req.biologistName && (
+                        <div className="text-[11px] text-slate-500 bg-emerald-50/20 border border-emerald-100/50 p-3 rounded-lg font-medium">
+                          Résultats validés biologiquement par le <strong className="text-slate-800">{req.biologistName}</strong> le {req.validatedAt}.
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-10 bg-slate-50 rounded-xl border border-dashed border-slate-200 p-6 space-y-2">
+                  <Clipboard className="w-10 h-10 text-slate-300 mx-auto" />
+                  <p className="text-xs font-bold text-slate-500">
+                    Aucun examen de laboratoire prescrit
+                  </p>
+                  <p className="text-[11px] text-slate-400 max-w-sm mx-auto leading-relaxed">
+                    Si votre médecin vous prescrit des analyses sanguines ou autres à la clinique, elles apparaîtront instantanément ici dès la prescription.
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>

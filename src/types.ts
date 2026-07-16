@@ -136,6 +136,11 @@ export interface LabTest {
   result?: string;
   referenceRange?: string;
   status: "En attente" | "En cours" | "Prêt";
+  unit?: string;
+  value?: string;
+  isAbnormal?: boolean;
+  referenceMin?: string;
+  referenceMax?: string;
 }
 
 export interface LabRequest {
@@ -146,9 +151,26 @@ export interface LabRequest {
   date: string;
   tests: LabTest[];
   status: "En attente" | "En cours" | "Prêt";
+  priority?: "normal" | "urgent";
+  sampleId?: string;
+  sampleType?: string;
+  sampleCollectedAt?: string;
+  validationStatus?: "en_attente_saisie" | "technicien_saisi" | "biologiste_valide";
+  biologistName?: string;
+  validatedAt?: string;
+  documents?: string[];
   technicianName?: string;
   updatedAt?: string;
   notes?: string;
+}
+
+export interface LabReagent {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: string;
+  threshold: number;
+  expiryDate: string;
 }
 
 export interface Complaint {
@@ -176,6 +198,7 @@ export interface SystemBackup {
   consultations?: Consultation[];
   prescriptions?: Prescription[];
   labRequests?: LabRequest[];
+  labReagents?: LabReagent[];
 }
 
 // Local Sync Queue for Offline Management

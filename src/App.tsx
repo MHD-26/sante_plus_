@@ -16,6 +16,7 @@ import AssistantIAView from "./components/AssistantIAView";
 import ProceduresView from "./components/ProceduresView";
 import SettingsView from "./components/SettingsView";
 import AuthView from "./components/AuthView";
+import LaboratoryView from "./components/LaboratoryView";
 
 export default function App() {
   const [authenticatedUser, setAuthenticatedUser] = useState<AppwriteUser | null>(null);
@@ -64,6 +65,8 @@ export default function App() {
     updatePrescriptionStatus,
     addLabRequest,
     updateLabRequest,
+    labReagents,
+    setLabReagents,
     exportBackup,
     importBackup,
   } = useAppState(authenticatedUser);
@@ -101,6 +104,7 @@ export default function App() {
       dashboard: [UserRole.ADMIN, UserRole.DIRECTION, UserRole.COMPTABLE, UserRole.ACCUEIL],
       rendezvous: [UserRole.ADMIN, UserRole.ACCUEIL, UserRole.MEDECIN, UserRole.DIRECTION],
       patients: [UserRole.ADMIN, UserRole.ACCUEIL, UserRole.MEDECIN, UserRole.DIRECTION],
+      laboratory: [UserRole.ADMIN, UserRole.DIRECTION, UserRole.MEDECIN, UserRole.LABORATOIRE],
       stockbilling: Object.values(UserRole),
       complaints: [UserRole.ADMIN, UserRole.DIRECTION, UserRole.ACCUEIL],
       settings: [UserRole.ADMIN, UserRole.DIRECTION],
@@ -172,6 +176,7 @@ export default function App() {
             patients={patients}
             appointments={appointments}
             invoices={invoices}
+            labRequests={labRequests}
             addComplaint={addComplaint}
             addAppointment={addAppointment}
             updateAppointment={updateAppointment}
@@ -252,6 +257,19 @@ export default function App() {
             updatePrescriptionStatus={updatePrescriptionStatus}
             currentUserRole={currentUserRole}
             patientDossierNumber={authenticatedUser?.dossierNumber}
+          />
+        );
+      case "laboratory":
+        return (
+          <LaboratoryView
+            labRequests={labRequests}
+            updateLabRequest={updateLabRequest}
+            patients={patients}
+            currentUserRole={currentUserRole}
+            authenticatedUser={authenticatedUser}
+            addAuditLog={addAuditLog}
+            labReagents={labReagents}
+            setLabReagents={setLabReagents}
           />
         );
       case "complaints":
