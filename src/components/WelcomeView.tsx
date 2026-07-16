@@ -301,6 +301,28 @@ export default function WelcomeView({
       return;
     }
 
+    // Validation des conflits d'horaires (minimum 30 minutes d'écart pour le même médecin)
+    const getAppTimestamp = (d: string, t: string) => new Date(`${d}T${t}:00`).getTime();
+    const newTimestamp = getAppTimestamp(newRdvDate, newRdvTime);
+    if (!isNaN(newTimestamp) && appointments) {
+      const minInterval = 30 * 60 * 1000; // 30 minutes en ms
+      for (const app of appointments) {
+        if (app.status === "Absent") continue;
+        if (app.doctorName === newRdvDoctor && app.date === newRdvDate) {
+          const appTimestamp = getAppTimestamp(app.date, app.time);
+          if (!isNaN(appTimestamp)) {
+            const diff = Math.abs(newTimestamp - appTimestamp);
+            if (diff < minInterval) {
+              alert(
+                `Conflit d'horaire : Le médecin ${newRdvDoctor} a déjà un rendez-vous le ${newRdvDate} à ${app.time}. Veuillez choisir un créneau espacé d'au moins 30 minutes.`
+              );
+              return;
+            }
+          }
+        }
+      }
+    }
+
     if (addAppointment) {
       addAppointment({
         patientId: activePatient.id,

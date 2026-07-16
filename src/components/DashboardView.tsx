@@ -164,6 +164,8 @@ export default function DashboardView({
   const filteredTodayAppointments = todayAppointments.filter((app) => {
     const matchesSearch =
       app.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.doctorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
       app.time.includes(searchTerm);
     const matchesStatus =
       statusFilter === "TOUT" ||
@@ -397,6 +399,7 @@ export default function DashboardView({
         <div className="bg-white border border-slate-200/60 rounded-xl p-5 hover:shadow-xs transition-all duration-200 flex flex-col justify-between">
           {currentUserRole === UserRole.ACCUEIL ||
           currentUserRole === UserRole.COMPTABLE ||
+          currentUserRole === UserRole.DIRECTION ||
           currentUserRole === UserRole.ADMIN ? (
             <>
               <div className="flex justify-between items-start">
@@ -604,6 +607,11 @@ export default function DashboardView({
                             <div>
                               <p className="font-semibold text-slate-800">{app.patientName}</p>
                               <p className="text-[9px] text-slate-400 font-mono">ID: {app.patientId}</p>
+                              {app.notes && (
+                                <p className="text-[9px] text-emerald-700 italic font-normal mt-0.5 max-w-xs truncate animate-fade-in" title={app.notes}>
+                                  Note: {app.notes}
+                                </p>
+                              )}
                             </div>
                           </div>
                         </td>
@@ -952,6 +960,11 @@ export default function DashboardView({
                       <p className="text-[10px] text-slate-400 font-mono">
                         Motif : {app.reason} • Dr. {app.doctorName}
                       </p>
+                      {app.notes && (
+                        <p className="text-[10px] text-slate-500 bg-slate-50 border border-slate-100/50 px-2 py-1 rounded italic mt-1 max-w-sm">
+                          Note : {app.notes}
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -1060,6 +1073,7 @@ export default function DashboardView({
 
           {currentUserRole === UserRole.ACCUEIL ||
           currentUserRole === UserRole.COMPTABLE ||
+          currentUserRole === UserRole.DIRECTION ||
           currentUserRole === UserRole.ADMIN ? (
             <div className="space-y-3.5 text-xs">
               {/* Wave / Mobile Money */}
