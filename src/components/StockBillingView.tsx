@@ -87,7 +87,9 @@ export default function StockBillingView({
   const [billingSearch, setBillingSearch] = useState("");
   const [showCreateInvoice, setShowCreateInvoice] = useState(false);
   const [selectedInvoiceForDetails, setSelectedInvoiceForDetails] = useState<Invoice | null>(
-    invoices[0] || null
+    currentUserRole === UserRole.PATIENT
+      ? invoices.find((inv) => inv.patientId === patientDossierNumber) || null
+      : invoices[0] || null
   );
 
   // New Invoice Form State
@@ -108,7 +110,11 @@ export default function StockBillingView({
   const [pharmacySearch, setPharmacySearch] = useState("");
   const [selectedPrescriptionId, setSelectedPrescriptionId] = useState<string | null>(null);
 
-  const selectedPrescription = prescriptions.find((p) => p.id === selectedPrescriptionId);
+  const selectedPrescription = prescriptions.find(
+    (p) =>
+      p.id === selectedPrescriptionId &&
+      (currentUserRole !== UserRole.PATIENT || p.patientId === patientDossierNumber)
+  );
 
   // Helper to match medication name with actual inventory items
   const findInventoryMatch = (prescriptionMedName: string) => {
@@ -277,6 +283,8 @@ export default function StockBillingView({
     }
   };
 
+  const isPatient = currentUserRole === UserRole.PATIENT;
+
   // Stock Filter
   const filteredStock = inventory.filter(
     (m) =>
@@ -284,76 +292,96 @@ export default function StockBillingView({
       m.category.toLowerCase().includes(stockSearch.toLowerCase())
   );
 
-  // Billing Filter
-  const filteredInvoices = invoices.filter(
-    (inv) =>
-      inv.patientName.toLowerCase().includes(billingSearch.toLowerCase()) ||
-      inv.id.toLowerCase().includes(billingSearch.toLowerCase())
-  );
+  // Billing Filter (Patients only see their own invoices)
+  const filteredInvoices = invoices
+    .filter((inv) => !isPatient || inv.patientId === patientDossierNumber)
+    .filter(
+      (inv) =>
+        inv.patientName.toLowerCase().includes(billingSearch.toLowerCase()) ||
+        inv.id.toLowerCase().includes(billingSearch.toLowerCase())
+    );
 
-  // Pharmacy Prescriptions Filter
-  const filteredPrescriptions = prescriptions.filter(
-    (p) =>
-      p.patientName.toLowerCase().includes(pharmacySearch.toLowerCase()) ||
-      p.id.toLowerCase().includes(pharmacySearch.toLowerCase())
-  );
+  // Pharmacy Prescriptions Filter (Patients only see their own prescriptions)
+  const filteredPrescriptions = prescriptions
+    .filter((p) => !isPatient || p.patientId === patientDossierNumber)
+    .filter(
+      (p) =>
+        p.patientName.toLowerCase().includes(pharmacySearch.toLowerCase()) ||
+        p.id.toLowerCase().includes(pharmacySearch.toLowerCase())
+    );
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 p-4 lg:p-6" id="stockbilling-root">
       {/* 1. STATE INDICATORS TOP ROW (3 boxes) */}
       <div className="xl:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Total Stock value */}
+        {/* Total Stock value or Catalogue reference */}
         <div className="bg-white border border-slate-100 rounded-xl p-4 shadow-3xs flex items-center space-x-4">
           <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
             <Pill className="w-6 h-6" />
           </div>
           <div>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Médicaments en Stock
+              {isPatient ? "Catalogue Tarifs" : "Médicaments en Stock"}
             </span>
             <p className="text-xl font-bold text-slate-800 mt-0.5">{inventory.length} Références</p>
-            <span className="text-[10px] text-red-500 font-semibold flex items-center mt-1">
-              {inventory.filter((m) => m.quantity <= m.threshold).length} alertes rupture stock
-            </span>
+            {isPatient ? (
+              <span className="text-[10px] text-slate-400 font-medium">
+                Tarifs de référence disponibles
+              </span>
+            ) : (
+              <span className="text-[10px] text-red-500 font-semibold flex items-center mt-1">
+                {inventory.filter((m) => m.quantity <= m.threshold).length} alertes rupture stock
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Total Revenue cashed */}
+        {/* Total Revenue cashed or My billing sum */}
         <div className="bg-white border border-slate-100 rounded-xl p-4 shadow-3xs flex items-center space-x-4">
           <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
             <DollarSign className="w-6 h-6" />
           </div>
           <div>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              Chiffre d'Affaires
+              {isPatient ? "Total de mes Factures" : "Chiffre d'Affaires"}
             </span>
             <p className="text-xl font-bold text-slate-800 mt-0.5">
-              {invoices
-                .filter((i) => i.status === "Payé")
-                .reduce((acc, i) => acc + i.amount, 0)
-                .toLocaleString()}{" "}
+              {isPatient
+                ? invoices
+                    .filter((i) => i.patientId === patientDossierNumber)
+                    .reduce((acc, i) => acc + (i.patientAmount || i.amount), 0)
+                    .toLocaleString()
+                : invoices
+                    .filter((i) => i.status === "Payé")
+                    .reduce((acc, i) => acc + i.amount, 0)
+                    .toLocaleString()}{" "}
               FCFA
             </p>
             <span className="text-[10px] text-slate-400 font-medium">
-              Encaissé sur les paiements validés
+              {isPatient ? "Montant cumulé de vos prestations" : "Encaissé sur les paiements validés"}
             </span>
           </div>
         </div>
 
-        {/* Prescriptions queue */}
+        {/* Prescriptions queue or My prescriptions */}
         <div className="bg-white border border-slate-100 rounded-xl p-4 shadow-3xs flex items-center space-x-4">
           <div className="p-3 bg-yellow-50 text-yellow-600 rounded-lg">
             <Clock className="w-6 h-6" />
           </div>
           <div>
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              File d'Attente Pharmacie
+              {isPatient ? "Mes Ordonnances" : "File d'Attente Pharmacie"}
             </span>
             <p className="text-xl font-bold text-slate-800 mt-0.5">
-              {prescriptions.filter((p) => p.status === "Prescrite").length} ordonnances
+              {isPatient
+                ? prescriptions.filter((p) => p.patientId === patientDossierNumber).length
+                : prescriptions.filter((p) => p.status === "Prescrite").length}{" "}
+              ordonnances
             </p>
-            <span className="text-[10px] text-yellow-600 font-semibold animate-pulse mt-1 block">
-              En attente de service/délivrance
+            <span className="text-[10px] text-yellow-600 font-semibold mt-1 block">
+              {isPatient
+                ? `${prescriptions.filter((p) => p.patientId === patientDossierNumber && p.status === "Prescrite").length} en attente de service`
+                : "En attente de service/délivrance"}
             </span>
           </div>
         </div>
@@ -370,7 +398,7 @@ export default function StockBillingView({
           }`}
         >
           <Pill className="w-4 h-4" />
-          <span>Pharmacie : Inventaire & Prix</span>
+          <span>{isPatient ? "Catalogue des Tarifs" : "Pharmacie : Inventaire & Prix"}</span>
         </button>
 
         <button
@@ -382,10 +410,14 @@ export default function StockBillingView({
           }`}
         >
           <Clock className="w-4 h-4" />
-          <span>Ordonnances à Servir</span>
-          {prescriptions.filter((p) => p.status === "Prescrite").length > 0 && (
+          <span>{isPatient ? "Mes Ordonnances" : "Ordonnances à Servir"}</span>
+          {(isPatient
+            ? prescriptions.filter((p) => p.patientId === patientDossierNumber && p.status === "Prescrite").length
+            : prescriptions.filter((p) => p.status === "Prescrite").length) > 0 && (
             <span className="w-4.5 h-4.5 bg-yellow-500 text-white font-mono font-bold text-[9px] rounded-full flex items-center justify-center animate-pulse">
-              {prescriptions.filter((p) => p.status === "Prescrite").length}
+              {isPatient
+                ? prescriptions.filter((p) => p.patientId === patientDossierNumber && p.status === "Prescrite").length
+                : prescriptions.filter((p) => p.status === "Prescrite").length}
             </span>
           )}
         </button>
@@ -399,10 +431,14 @@ export default function StockBillingView({
           }`}
         >
           <FileText className="w-4 h-4" />
-          <span>Facturation & Comptabilité</span>
-          {invoices.filter((i) => i.status === "En attente").length > 0 && (
+          <span>{isPatient ? "Mes Factures Clinique" : "Facturation & Comptabilité"}</span>
+          {(!isPatient
+            ? invoices.filter((i) => i.status === "En attente").length
+            : invoices.filter((i) => i.patientId === patientDossierNumber && i.status === "En attente").length) > 0 && (
             <span className="w-4.5 h-4.5 bg-red-500 text-white font-mono font-bold text-[9px] rounded-full flex items-center justify-center">
-              {invoices.filter((i) => i.status === "En attente").length}
+              {isPatient
+                ? invoices.filter((i) => i.patientId === patientDossierNumber && i.status === "En attente").length
+                : invoices.filter((i) => i.status === "En attente").length}
             </span>
           )}
         </button>
@@ -771,19 +807,25 @@ export default function StockBillingView({
 
                 {selectedPrescription.status === "Prescrite" ? (
                   <div className="pt-4 border-t border-slate-100 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => handleDispensePrescription(selectedPrescription)}
-                      className="inline-flex items-center space-x-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-xs cursor-pointer"
-                    >
-                      <Pill className="w-4 h-4" />
-                      <span>Délivrer les Médicaments & Facturer</span>
-                    </button>
+                    {currentUserRole !== UserRole.PATIENT ? (
+                      <button
+                        type="button"
+                        onClick={() => handleDispensePrescription(selectedPrescription)}
+                        className="inline-flex items-center space-x-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-xs cursor-pointer"
+                      >
+                        <Pill className="w-4 h-4" />
+                        <span>Délivrer les Médicaments & Facturer</span>
+                      </button>
+                    ) : (
+                      <span className="text-xs text-yellow-700 font-bold bg-yellow-50 px-3 py-2 rounded-lg border border-yellow-200">
+                        Cette ordonnance est en cours de préparation par la pharmacie interne.
+                      </span>
+                    )}
                   </div>
                 ) : (
-                  <div className="pt-4 border-t border-slate-100 text-xs text-slate-400 italic">
-                    Cette ordonnance a déjà été servie par la pharmacie interne. Facture automatique
-                    générée.
+                  <div className="pt-4 border-t border-slate-100 text-xs text-emerald-800 font-bold bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200 flex items-center">
+                    <CheckCircle className="w-4 h-4 mr-1.5 text-emerald-600" />
+                    <span>Cette ordonnance a été servie et délivrée par la pharmacie.</span>
                   </div>
                 )}
               </div>
@@ -1183,7 +1225,7 @@ export default function StockBillingView({
       )}
 
       {/* --- 5. PRINTABLE CASH RECEIPT MODAL --- */}
-      {selectedInvoiceForReceipt && (
+      {selectedInvoiceForReceipt && (currentUserRole !== UserRole.PATIENT || selectedInvoiceForReceipt.patientId === patientDossierNumber) && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex justify-center items-center p-4 z-50">
           <div className="bg-white border-2 border-emerald-800 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh]">
             {/* Modal Header */}
